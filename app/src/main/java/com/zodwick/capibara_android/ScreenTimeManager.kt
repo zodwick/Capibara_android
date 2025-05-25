@@ -55,9 +55,38 @@ class ScreenTimeManager(private val context: Context) {
     private fun getAppName(packageName: String): String {
         return try {
             val applicationInfo = packageManager.getApplicationInfo(packageName, 0)
-            packageManager.getApplicationLabel(applicationInfo).toString()
+            val appName = packageManager.getApplicationLabel(applicationInfo).toString()
+            
+            // Handle common system apps with user-friendly names
+            when {
+                packageName.contains("launcher") -> "Home Screen"
+                packageName.contains("nexuslauncher") -> "Pixel Launcher"
+                packageName.contains("systemui") -> "System UI"
+                packageName.contains("settings") -> "Settings"
+                packageName.contains("chrome") -> "Chrome"
+                packageName.contains("photos") -> "Google Photos"
+                packageName.contains("gmail") -> "Gmail"
+                packageName.contains("maps") -> "Google Maps"
+                packageName.contains("youtube") -> "YouTube"
+                packageName.contains("whatsapp") -> "WhatsApp"
+                packageName.contains("instagram") -> "Instagram"
+                packageName.contains("facebook") -> "Facebook"
+                packageName.contains("twitter") -> "Twitter"
+                packageName.contains("spotify") -> "Spotify"
+                packageName.contains("netflix") -> "Netflix"
+                else -> appName
+            }
         } catch (e: PackageManager.NameNotFoundException) {
-            packageName
+            // Fallback for unknown packages
+            packageName.substringAfterLast(".").replaceFirstChar { it.uppercase() }
+        }
+    }
+    
+    fun getAppIcon(packageName: String): android.graphics.drawable.Drawable? {
+        return try {
+            packageManager.getApplicationIcon(packageName)
+        } catch (e: PackageManager.NameNotFoundException) {
+            null
         }
     }
     
@@ -77,9 +106,20 @@ class ScreenTimeManager(private val context: Context) {
         val minutes = (milliseconds % (1000 * 60 * 60)) / (1000 * 60)
         
         return when {
+            hours > 0 -> "${hours}h ${minutes}min"
+            minutes > 0 -> "${minutes} min"
+            else -> "<1 min"
+        }
+    }
+    
+    fun formatTimeShort(milliseconds: Long): String {
+        val hours = milliseconds / (1000 * 60 * 60)
+        val minutes = (milliseconds % (1000 * 60 * 60)) / (1000 * 60)
+        
+        return when {
             hours > 0 -> "${hours}h ${minutes}m"
             minutes > 0 -> "${minutes}m"
-            else -> "< 1m"
+            else -> "<1m"
         }
     }
 } 

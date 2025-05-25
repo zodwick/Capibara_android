@@ -12,10 +12,21 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.border
+import androidx.compose.foundation.Image
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.Color
+import androidx.core.graphics.drawable.toBitmap
+import kotlinx.coroutines.delay
+import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -219,10 +230,27 @@ fun PermissionRequestCard(onRequestPermission: () -> Unit) {
 fun ScreenTimeContent(data: DailyScreenTime) {
     val manager = ScreenTimeManager(LocalContext.current)
     
+    // Animated screen time counter
+    val targetMinutes = (data.totalScreenTime / (1000 * 60)).toInt()
+    var animatedMinutes by remember { mutableStateOf(0) }
+    
+    LaunchedEffect(targetMinutes) {
+        val duration = 1500 // 1.5 seconds
+        val steps = 60
+        val stepDelay = duration / steps
+        val increment = targetMinutes / steps
+        
+        for (i in 0..steps) {
+            animatedMinutes = (increment * i).coerceAtMost(targetMinutes)
+            delay(stepDelay.toLong())
+        }
+        animatedMinutes = targetMinutes
+    }
+    
     LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(20.dp) // Increased spacing
     ) {
-        // Total screen time card with gentle design
+        // Total screen time card with gentle design and animation
         item {
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -244,7 +272,7 @@ fun ScreenTimeContent(data: DailyScreenTime) {
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        text = manager.formatTime(data.totalScreenTime),
+                        text = manager.formatTime(animatedMinutes * 60 * 1000L),
                         style = MaterialTheme.typography.displayMedium,
                         fontWeight = FontWeight.Light,
                         color = MaterialTheme.colorScheme.tertiary
@@ -287,7 +315,7 @@ fun ScreenTimeContent(data: DailyScreenTime) {
                 }
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(
-                    text = "Your Digital Companions",
+                    text = "Most Used Apps Today",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Light,
                     color = MaterialTheme.colorScheme.primary
@@ -309,8 +337,15 @@ fun ScreenTimeContent(data: DailyScreenTime) {
 
 @Composable
 fun AppUsageCard(appUsage: AppUsage, manager: ScreenTimeManager) {
+    val context = LocalContext.current
+    val appIcon = remember(appUsage.packageName) {
+        manager.getAppIcon(appUsage.packageName)
+    }
+    
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp), // Better tap target spacing
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
@@ -320,30 +355,49 @@ fun AppUsageCard(appUsage: AppUsage, manager: ScreenTimeManager) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp),
+                .padding(24.dp), // Increased padding for better touch targets
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Gentle app icon with soft colors
+            // Real app icon or fallback
             Box(
                 modifier = Modifier
                     .size(56.dp)
                     .background(
-                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
+                        if (appIcon != null) Color.Transparent 
+                        else MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
                         CircleShape
                     )
                     .border(
-                        1.dp,
+                        if (appIcon != null) 0.dp else 1.dp,
                         MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
                         CircleShape
                     ),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = appUsage.appName.take(1).uppercase(),
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Light,
-                    color = MaterialTheme.colorScheme.primary
-                )
+                val iconBitmap = remember(appIcon) {
+                    try {
+                        appIcon?.toBitmap(56, 56)
+                    } catch (e: Exception) {
+                        null
+                    }
+                }
+                
+                if (iconBitmap != null) {
+                    Image(
+                        bitmap = iconBitmap.asImageBitmap(),
+                        contentDescription = appUsage.appName,
+                        modifier = Modifier
+                            .size(56.dp)
+                            .clip(CircleShape)
+                    )
+                } else {
+                    Text(
+                        text = appUsage.appName.take(1).uppercase(),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Light,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
             }
             
             Spacer(modifier = Modifier.width(20.dp))
@@ -355,7 +409,7 @@ fun AppUsageCard(appUsage: AppUsage, manager: ScreenTimeManager) {
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(6.dp))
                 Text(
                     text = manager.formatTime(appUsage.timeInForeground),
                     style = MaterialTheme.typography.bodyLarge,
@@ -364,17 +418,17 @@ fun AppUsageCard(appUsage: AppUsage, manager: ScreenTimeManager) {
                 )
             }
             
-            // Gentle time indicator
+            // Gentle time indicator with short format
             Box(
                 modifier = Modifier
                     .background(
                         MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f),
                         RoundedCornerShape(12.dp)
                     )
-                    .padding(horizontal = 12.dp, vertical = 6.dp)
+                    .padding(horizontal = 12.dp, vertical = 8.dp)
             ) {
                 Text(
-                    text = manager.formatTime(appUsage.timeInForeground),
+                    text = manager.formatTimeShort(appUsage.timeInForeground),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.secondary,
                     fontWeight = FontWeight.Medium
