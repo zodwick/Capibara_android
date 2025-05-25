@@ -1327,7 +1327,7 @@ fun DetailedUsageScreen(navController: NavController) {
             TopAppBar(
                 title = { 
                     Text(
-                        "📊 Detailed Usage", 
+                        "Detailed Usage", 
                         fontFamily = FontFamily.Serif,
                         fontWeight = FontWeight.Medium,
                         fontSize = 22.sp,
@@ -1366,11 +1366,24 @@ fun DetailedUsageScreen(navController: NavController) {
                     brush = Brush.verticalGradient(
                         colors = listOf(
                             MaterialTheme.colorScheme.background,
-                            MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.1f)
+                            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.15f),
+                            MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.1f),
+                            MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.05f)
                         )
                     )
                 )
         ) {
+            // Enhanced background with parallax - same as main page
+            Image(
+                painter = painterResource(id = R.drawable.sunset_wide_1536_1024_ghibly),
+                contentDescription = "Peaceful background",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .alpha(0.2f)
+                    .scale(1.1f),
+                contentScale = androidx.compose.ui.layout.ContentScale.Crop
+            )
+            
             if (!hasPermission) {
                 // Show permission request
                 Box(
@@ -1399,7 +1412,7 @@ fun DetailedUsageScreen(navController: NavController) {
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(horizontal = 24.dp),
-                    verticalArrangement = Arrangement.spacedBy(24.dp),
+                    verticalArrangement = Arrangement.spacedBy(32.dp),
                     contentPadding = PaddingValues(vertical = 24.dp)
                 ) {
                     item {
@@ -1417,62 +1430,100 @@ fun DetailedUsageScreen(navController: NavController) {
 
 @Composable
 fun UsageOverviewCard(screenTimeData: DailyScreenTime?) {
+    val context = LocalContext.current
+    val settingsManager = remember { SettingsManager(context) }
+    val userSettings = remember { settingsManager.loadSettings() }
+    
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .shadow(16.dp, RoundedCornerShape(28.dp)),
-        shape = RoundedCornerShape(28.dp),
+            .shadow(16.dp, RoundedCornerShape(32.dp)),
+        shape = RoundedCornerShape(32.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)
+            containerColor = Color.White
         )
     ) {
         Column(
-            modifier = Modifier.padding(28.dp)
+            modifier = Modifier.padding(40.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "📱 Today's Overview",
+                text = "Today's Overview",
                 fontFamily = FontFamily.Serif,
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Center
             )
             
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(32.dp))
             
             screenTimeData?.let { data ->
                 val totalHours = data.totalScreenTime / (1000 * 60 * 60)
                 val totalMinutes = (data.totalScreenTime % (1000 * 60 * 60)) / (1000 * 60)
-                val appCount = data.appUsageList.size
+                val timeString = if (totalHours > 0) "${totalHours}h ${totalMinutes}m" else "${totalMinutes}m"
+                
+                // Show total time
+                Text(
+                    text = timeString,
+                    fontFamily = FontFamily.SansSerif,
+                    style = MaterialTheme.typography.displayMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    textAlign = TextAlign.Center
+                )
+                
+                Text(
+                    text = "Screen Time",
+                    fontFamily = FontFamily.SansSerif,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                    textAlign = TextAlign.Center
+                )
+                
+                Spacer(modifier = Modifier.height(32.dp))
+                
+                // Progress bar
+                val totalMinutesUsed = (data.totalScreenTime / (1000 * 60)).toInt()
+                val targetMinutes = (userSettings.dailyTargetHours * 60).toInt()
+                val progress = (totalMinutesUsed.toFloat() / targetMinutes.toFloat()).coerceAtMost(1.5f)
                 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    UsageStatItem(
-                        title = "Total Time",
-                        value = "${totalHours}h ${totalMinutes}m",
-                        icon = "⏰",
-                        color = MaterialTheme.colorScheme.primary
+                    Text(
+                        text = "Daily Goal",
+                        fontFamily = FontFamily.SansSerif,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     
-                    UsageStatItem(
-                        title = "Apps Used",
-                        value = appCount.toString(),
-                        icon = "📱",
-                        color = MaterialTheme.colorScheme.secondary
+                    Text(
+                        text = "${totalMinutesUsed}m / ${targetMinutes}m",
+                        fontFamily = FontFamily.SansSerif,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Medium,
+                        color = if (totalMinutesUsed > targetMinutes) 
+                                MaterialTheme.colorScheme.error 
+                                else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                     )
-                    
-                    val mostUsedApp = data.appUsageList.firstOrNull()
-                    mostUsedApp?.let { app ->
-                        val appMinutes = (app.timeInForeground / (1000 * 60)).toInt()
-                        UsageStatItem(
-                            title = "Top App",
-                            value = "${appMinutes}m",
-                            icon = "🏆",
-                            color = MaterialTheme.colorScheme.tertiary
-                        )
-                    }
                 }
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                LinearProgressIndicator(
+                    progress = { progress },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(8.dp),
+                    color = if (totalMinutesUsed > targetMinutes) MaterialTheme.colorScheme.error 
+                           else MaterialTheme.colorScheme.primary,
+                    trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                )
+                
             } ?: run {
                 Text(
                     text = "No usage data available for today",
@@ -1487,39 +1538,7 @@ fun UsageOverviewCard(screenTimeData: DailyScreenTime?) {
     }
 }
 
-@Composable
-fun UsageStatItem(
-    title: String,
-    value: String,
-    icon: String,
-    color: Color
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(8.dp)
-    ) {
-        Text(
-            text = icon,
-            fontSize = 32.sp
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = value,
-            fontFamily = FontFamily.SansSerif,
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold,
-            color = color
-        )
-        Text(
-            text = title,
-            fontFamily = FontFamily.SansSerif,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-            fontWeight = FontWeight.Normal,
-            textAlign = TextAlign.Center
-        )
-    }
-}
+
 
 @Composable
 fun AppUsageBreakdownCard(screenTimeData: DailyScreenTime?) {
@@ -1529,22 +1548,12 @@ fun AppUsageBreakdownCard(screenTimeData: DailyScreenTime?) {
             .shadow(16.dp, RoundedCornerShape(28.dp)),
         shape = RoundedCornerShape(28.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)
+            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.98f)
         )
     ) {
         Column(
-            modifier = Modifier.padding(28.dp)
+            modifier = Modifier.padding(32.dp)
         ) {
-            Text(
-                text = "📊 App Breakdown",
-                fontFamily = FontFamily.Serif,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            
-            Spacer(modifier = Modifier.height(24.dp))
-            
             screenTimeData?.let { data ->
                 if (data.appUsageList.isNotEmpty()) {
                     // Show top 10 apps
@@ -1561,7 +1570,7 @@ fun AppUsageBreakdownCard(screenTimeData: DailyScreenTime?) {
                     }
                     
                     if (data.appUsageList.size > 10) {
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(20.dp))
                         Text(
                             text = "... and ${data.appUsageList.size - 10} more apps",
                             fontFamily = FontFamily.SansSerif,
@@ -1601,7 +1610,6 @@ fun AppUsageItem(
     rank: Int,
     totalScreenTime: Long
 ) {
-    val percentage = ((appUsage.timeInForeground.toFloat() / totalScreenTime.toFloat()) * 100).toInt()
     val hours = appUsage.timeInForeground / (1000 * 60 * 60)
     val minutes = (appUsage.timeInForeground % (1000 * 60 * 60)) / (1000 * 60)
     
@@ -1612,80 +1620,28 @@ fun AppUsageItem(
     }
     
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Rank badge
-        Box(
-            modifier = Modifier
-                .size(32.dp)
-                .background(
-                    when (rank) {
-                        1 -> MaterialTheme.colorScheme.primary
-                        2 -> MaterialTheme.colorScheme.secondary
-                        3 -> MaterialTheme.colorScheme.tertiary
-                        else -> MaterialTheme.colorScheme.outline
-                    },
-                    CircleShape
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = rank.toString(),
-                fontFamily = FontFamily.SansSerif,
-                style = MaterialTheme.typography.bodySmall,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
-        }
-        
-        Spacer(modifier = Modifier.width(16.dp))
-        
-        // App info
-        Column(
+        Text(
+            text = appUsage.appName,
+            fontFamily = FontFamily.SansSerif,
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.weight(1f)
-        ) {
-            Text(
-                text = appUsage.appName,
-                fontFamily = FontFamily.SansSerif,
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            
-            Text(
-                text = "$timeString • $percentage%",
-                fontFamily = FontFamily.SansSerif,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-            )
-        }
+        )
         
-        // Usage bar
-        Box(
-            modifier = Modifier
-                .width(60.dp)
-                .height(8.dp)
-                .background(
-                    MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
-                    RoundedCornerShape(4.dp)
-                )
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .fillMaxWidth(percentage / 100f)
-                    .background(
-                        when (rank) {
-                            1 -> MaterialTheme.colorScheme.primary
-                            2 -> MaterialTheme.colorScheme.secondary
-                            3 -> MaterialTheme.colorScheme.tertiary
-                            else -> MaterialTheme.colorScheme.outline
-                        },
-                        RoundedCornerShape(4.dp)
-                    )
-            )
-        }
+        Text(
+            text = timeString,
+            fontFamily = FontFamily.SansSerif,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+            fontWeight = FontWeight.Medium
+        )
     }
 }
 
