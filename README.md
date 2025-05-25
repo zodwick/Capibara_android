@@ -1,3 +1,7 @@
+Credits:
+- https://www.freepik.com/author/upklyak for the amazing capibara svgs which was the inspiration for all assets.
+
+
 # Digital Wellbeing App
 
 A simple Android app that tracks and displays your daily screen time using Android's UsageStatsManager API.
