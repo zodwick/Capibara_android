@@ -201,13 +201,27 @@ fun CapybaraSanctuaryScreen(navController: NavController) {
         topBar = {
             TopAppBar(
                 title = { 
-                    Text(
-                        "🌸 Capybara Sanctuary",
-                        fontFamily = FontFamily.Serif,
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 22.sp,
-                        color = MaterialTheme.colorScheme.onSurface
-                    ) 
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.capybara_cartoon_style_sitting_happy_drinking_boba_tea_with_hearts_facing_forward_solo),
+                            contentDescription = "Sanctuary icon",
+                            modifier = Modifier
+                                .size(28.dp)
+                                .clip(CircleShape)
+                        )
+                        
+                        Spacer(modifier = Modifier.width(8.dp))
+                        
+                        Text(
+                            "Sanctuary",
+                            fontFamily = FontFamily.Serif,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 22.sp,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
                 },
                 actions = {
                     IconButton(
@@ -786,11 +800,11 @@ fun SimpleMoodSummary(capybaras: List<Capybara>) {
     val alivePercentage = (aliveCount / 30f) * 100f
     
     val summaryText = when {
-        alivePercentage >= 80f -> "Your capybaras are thriving! Excellent digital wellness! 🌟"
-        alivePercentage >= 60f -> "Most capybaras are content with your screen time habits 😊"
-        alivePercentage >= 40f -> "Some capybaras are getting tired from screen time 😐"
-        alivePercentage >= 20f -> "Many capybaras need rest - consider reducing screen time 😟"
-        else -> "Your capybaras are exhausted - time for a digital detox! 😰"
+        alivePercentage >= 80f -> "Your capybaras are thriving! Excellent digital wellness!"
+        alivePercentage >= 60f -> "Most capybaras are content with your screen time habits"
+        alivePercentage >= 40f -> "Some capybaras are getting tired from screen time"
+        alivePercentage >= 20f -> "Many capybaras need rest - consider reducing screen time"
+        else -> "Your capybaras are exhausted - time for a digital detox!"
     }
     
     Text(
@@ -880,10 +894,14 @@ fun BigCapybaraItem(
                     .clip(CircleShape)
             )
         } else {
-            // Show sleep emoji for resting capybaras
-            Text(
-                text = "💤",
-                fontSize = 56.sp
+            // Show small sleeping capybara for resting capybaras
+            Image(
+                painter = painterResource(id = R.drawable.capybara_cartoon_style_sleeping_curled_up_with_zzz_facing_right_solo),
+                contentDescription = "Sleeping capybara",
+                modifier = Modifier
+                    .size(56.dp)
+                    .alpha(0.7f)
+                    .clip(CircleShape)
             )
         }
     }
@@ -945,30 +963,18 @@ fun InteractiveCapybaraGrid(
         )
     ) {
         Column(
-            modifier = Modifier.padding(24.dp)
+            modifier = Modifier.padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-                    Text(
-                    text = "Your Capybara Friends",
-                    fontFamily = FontFamily.Serif,
-                        style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                    )
-                
-                    val aliveCount = capybaras.count { it.isAlive }
-                    Text(
-                    text = "${aliveCount}/30",
-                    fontFamily = FontFamily.SansSerif,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                )
-            }
+            Text(
+                text = "Your Capybara Friends",
+                fontFamily = FontFamily.Serif,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
             
             Spacer(modifier = Modifier.height(16.dp))
             
@@ -1039,10 +1045,13 @@ fun InteractiveCapybaraItem(
                     )
             }
                 } else {
-                    Text(
-                text = "💤",
-                fontSize = 40.sp,
-                modifier = Modifier.alpha(0.7f)
+                    Image(
+                painter = painterResource(id = R.drawable.capybara_cartoon_style_sleeping_curled_up_with_zzz_facing_right_solo),
+                contentDescription = "Sleeping capybara",
+                modifier = Modifier
+                    .size(40.dp)
+                    .alpha(0.7f)
+                    .clip(CircleShape)
             )
         }
     }
@@ -1067,23 +1076,37 @@ fun BeautifulWellnessInsights(
         Column(
             modifier = Modifier.padding(28.dp)
         ) {
-            Text(
-                text = "🌱 Wellness Insights",
-                fontFamily = FontFamily.Serif,
-                        style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.capybara_cartoon_style_sitting_content_happy__eating_lettuce_with_heart_facing_left_solo),
+                    contentDescription = "Wellness capybara",
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(CircleShape)
+                )
+                
+                Spacer(modifier = Modifier.width(12.dp))
+                
+                Text(
+                    text = "Wellness Insights",
+                    fontFamily = FontFamily.Serif,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
             
             Spacer(modifier = Modifier.height(20.dp))
             
             val aliveCount = capybaras.count { it.isAlive }
             val message = when {
-                aliveCount >= 25 -> "Your capybaras are thriving! You're maintaining excellent digital balance. Keep up the mindful usage! 🌟"
-                aliveCount >= 20 -> "Most of your capybaras are content. You're doing well with your screen time goals. 🌿"
-                aliveCount >= 15 -> "Some capybaras are getting tired. Consider taking more breaks throughout the day. 🍃"
-                aliveCount >= 10 -> "Your capybaras need more rest. Try reducing screen time or taking longer breaks. 🌸"
-                else -> "Your capybaras are very tired. Time for a digital detox to restore balance! 🧘‍♀️"
+                aliveCount >= 25 -> "Your capybaras are thriving! You're maintaining excellent digital balance. Keep up the mindful usage!"
+                aliveCount >= 20 -> "Most of your capybaras are content. You're doing well with your screen time goals."
+                aliveCount >= 15 -> "Some capybaras are getting tired. Consider taking more breaks throughout the day."
+                aliveCount >= 10 -> "Your capybaras need more rest. Try reducing screen time or taking longer breaks."
+                else -> "Your capybaras are very tired. Time for a digital detox to restore balance!"
             }
             
             Text(
@@ -1158,9 +1181,12 @@ fun EnhancedPermissionCard(onRequestPermission: () -> Unit) {
             modifier = Modifier.padding(40.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-                Text(
-                text = "🌸",
-                fontSize = 80.sp
+            Image(
+                painter = painterResource(id = R.drawable.capybara_cartoon_style_sitting_happy_drinking_boba_tea_with_hearts_facing_forward_solo),
+                contentDescription = "Welcome capybara",
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(CircleShape)
             )
             
             Spacer(modifier = Modifier.height(24.dp))
