@@ -613,12 +613,12 @@ fun BeautifulSanctuaryHeader(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
                         // Enlarged capybara without animation
-            Box(
-                modifier = Modifier
+                Box(
+                    modifier = Modifier
                     .fillMaxWidth()
                     .height(160.dp),
-                contentAlignment = Alignment.Center
-            ) {
+                    contentAlignment = Alignment.Center
+                ) {
                 Image(
                     painter = painterResource(id = getSanctuaryWellnessCapybara(healthPercentage)),
                     contentDescription = "Sanctuary wellness indicator",
