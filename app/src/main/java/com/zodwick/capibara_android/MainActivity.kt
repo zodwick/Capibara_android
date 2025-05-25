@@ -600,7 +600,7 @@ fun BeautifulSanctuaryHeader(
             modifier = Modifier.padding(32.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Animated wellness indicator with pulsing effect
+                        // Animated wellness indicator with pulsing effect
             val pulseScale by animateFloatAsState(
                 targetValue = 1f + sin(animationTime * 2) * 0.05f,
                 animationSpec = tween(100)
@@ -608,37 +608,60 @@ fun BeautifulSanctuaryHeader(
             
             Box(
                 modifier = Modifier
-                    .size(100.dp)
-                    .scale(pulseScale)
-                    .background(
-                        brush = Brush.radialGradient(
-                            colors = listOf(
-                                healthColor.copy(alpha = 0.2f),
-                                healthColor.copy(alpha = 0.05f)
-                            )
-                        ),
-                        shape = CircleShape
-                    )
-                    .border(4.dp, healthColor.copy(alpha = 0.4f), CircleShape),
+                    .size(120.dp)
+                    .scale(pulseScale),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = when {
-                        healthPercentage >= 0.8f -> "😊"
-                        healthPercentage >= 0.5f -> "😐"
-                        else -> "😰"
-                    },
-                    fontSize = 40.sp
+                // Background circle with health color
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .background(
+                            brush = Brush.radialGradient(
+                                colors = listOf(
+                                    healthColor.copy(alpha = 0.2f),
+                                    healthColor.copy(alpha = 0.05f)
+                                )
+                            ),
+                            shape = CircleShape
+                        )
+                        .border(4.dp, healthColor.copy(alpha = 0.4f), CircleShape)
                 )
+                
+                // Capybara image with better white background handling
+                Box(
+                    modifier = Modifier
+                        .size(90.dp)
+                        .clip(CircleShape)
+                        .background(
+                            brush = Brush.radialGradient(
+                                colors = listOf(
+                                    Color.White,
+                                    Color.White.copy(alpha = 0.9f)
+                                )
+                            )
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = getSanctuaryWellnessCapybara(healthPercentage)),
+                        contentDescription = "Sanctuary wellness indicator",
+                        modifier = Modifier
+                            .size(85.dp)
+                            .clip(CircleShape),
+                        contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                    )
+                }
             }
             
             Spacer(modifier = Modifier.height(24.dp))
             
-            Text(
+                            Text(
                 text = when {
-                    healthPercentage >= 0.8f -> "Sanctuary Thriving"
-                    healthPercentage >= 0.5f -> "Sanctuary Stable"
-                    else -> "Sanctuary Needs Care"
+                    healthPercentage >= 0.8f -> "Sanctuary in Perfect Harmony"
+                    healthPercentage >= 0.5f -> "Sanctuary Needs Attention"
+                    healthPercentage >= 0.2f -> "Sanctuary in Distress"
+                    else -> "Sanctuary in Crisis"
                 },
                 fontFamily = FontFamily.Serif,
                 style = MaterialTheme.typography.headlineMedium,
@@ -1246,6 +1269,15 @@ fun getCapybaraDrawable(mood: CapybaraMood): Int {
         CapybaraMood.SLEEPY -> R.drawable.capybara_cartoon_style_sleeping_curled_up_with_zzz_facing_right_solo
         CapybaraMood.WORRIED -> R.drawable.capybara_cartoon_style_sitting_confused_bread_costume_eyes_closed_question_mark_facing_left_solo
         CapybaraMood.ANGRY -> R.drawable.capybara_cartoon_style_sitting_annoyed_holding_knife_steam_angry_face_facing_right_solo
+    }
+}
+
+fun getSanctuaryWellnessCapybara(healthPercentage: Float): Int {
+    return when {
+        healthPercentage >= 0.8f -> R.drawable.capybara_sitting_peacefully_meditation_pose_eyes_closed_small_smile_floating_cherry_blossoms_around_it_white_bg
+        healthPercentage >= 0.5f -> R.drawable.capybara_sitting_upright_alert_but_calm_looking_slightly_concerned_but_hopeful_white_bg
+        healthPercentage >= 0.2f -> R.drawable.capybara_sitting_with_drooped_ears_tired_expression_holding_a_small_wilted_flower_white_bg
+        else -> R.drawable.capybara_hungry_and_in_despair_white_bg
     }
 }
 
