@@ -20,28 +20,55 @@ class ScreenTimeManager(private val context: Context) {
         val startTime = calendar.timeInMillis
         val endTime = System.currentTimeMillis()
         
-        val usageStats = usageStatsManager.queryUsageStats(
-            UsageStatsManager.INTERVAL_DAILY,
-            startTime,
-            endTime
-        )
+        // Use UsageEvents for more accurate current day tracking
+        val usageEvents = usageStatsManager.queryEvents(startTime, endTime)
+        val appUsageMap = mutableMapOf<String, Long>()
+        val appLastUsedMap = mutableMapOf<String, Long>()
+        val appSessionMap = mutableMapOf<String, Long>()
+        
+        val event = android.app.usage.UsageEvents.Event()
+        while (usageEvents.hasNextEvent()) {
+            usageEvents.getNextEvent(event)
+            
+            when (event.eventType) {
+                android.app.usage.UsageEvents.Event.ACTIVITY_RESUMED -> {
+                    appSessionMap[event.packageName] = event.timeStamp
+                }
+                android.app.usage.UsageEvents.Event.ACTIVITY_PAUSED -> {
+                    val sessionStart = appSessionMap[event.packageName]
+                    if (sessionStart != null) {
+                        val sessionDuration = event.timeStamp - sessionStart
+                        appUsageMap[event.packageName] = (appUsageMap[event.packageName] ?: 0) + sessionDuration
+                        appLastUsedMap[event.packageName] = event.timeStamp
+                        appSessionMap.remove(event.packageName)
+                    }
+                }
+            }
+        }
+        
+        // Handle apps that are still in foreground (no PAUSED event yet)
+        for ((packageName, sessionStart) in appSessionMap) {
+            val sessionDuration = endTime - sessionStart
+            appUsageMap[packageName] = (appUsageMap[packageName] ?: 0) + sessionDuration
+            appLastUsedMap[packageName] = endTime
+        }
         
         val appUsageList = mutableListOf<AppUsage>()
         var totalScreenTime = 0L
         
-        for (usageStat in usageStats) {
-            if (usageStat.totalTimeInForeground > 0) {
-                val appName = getAppName(usageStat.packageName)
-                if (appName.isNotEmpty() && !isSystemApp(usageStat.packageName)) {
+        for ((packageName, timeInForeground) in appUsageMap) {
+            if (timeInForeground > 0) {
+                val appName = getAppName(packageName)
+                if (appName.isNotEmpty() && !isSystemApp(packageName)) {
                     appUsageList.add(
                         AppUsage(
                             appName = appName,
-                            packageName = usageStat.packageName,
-                            timeInForeground = usageStat.totalTimeInForeground,
-                            lastTimeUsed = usageStat.lastTimeUsed
+                            packageName = packageName,
+                            timeInForeground = timeInForeground,
+                            lastTimeUsed = appLastUsedMap[packageName] ?: 0L
                         )
                     )
-                    totalScreenTime += usageStat.totalTimeInForeground
+                    totalScreenTime += timeInForeground
                 }
             }
         }
