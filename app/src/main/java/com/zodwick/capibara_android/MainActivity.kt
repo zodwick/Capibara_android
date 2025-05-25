@@ -1,5 +1,7 @@
 package com.zodwick.capibara_android
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -7,26 +9,36 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.border
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.ArrowBack
+
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.Color
-import androidx.core.graphics.drawable.toBitmap
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import kotlinx.coroutines.delay
-import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -37,7 +49,57 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.zodwick.capibara_android.ui.theme.CapibaraAndroidTheme
+import java.util.*
+import kotlin.math.max
+import kotlin.math.sin
+import kotlin.math.cos
+import kotlin.random.Random
+
+data class Capybara(
+    val id: Int,
+    val isAlive: Boolean = true,
+    val mood: CapybaraMood = CapybaraMood.HAPPY,
+    val lastSeenTime: Long = System.currentTimeMillis(),
+    val animationOffset: Float = Random.nextFloat() * 1000f,
+    val isSelected: Boolean = false
+)
+
+enum class CapybaraMood {
+    HAPPY, CONTENT, SLEEPY, WORRIED, ANGRY, PEACEFUL, EXCITED
+}
+
+data class UserSettings(
+    val dailyTargetHours: Float = 3f,
+    val notificationsEnabled: Boolean = true,
+    val soundEnabled: Boolean = true
+)
+
+class SettingsManager(private val context: Context) {
+    private val prefs: SharedPreferences = context.getSharedPreferences("capybara_settings", Context.MODE_PRIVATE)
+    
+    fun saveSettings(settings: UserSettings) {
+        prefs.edit().apply {
+            putFloat("daily_target_hours", settings.dailyTargetHours)
+            putBoolean("notifications_enabled", settings.notificationsEnabled)
+            putBoolean("sound_enabled", settings.soundEnabled)
+            apply()
+        }
+    }
+    
+    fun loadSettings(): UserSettings {
+        return UserSettings(
+            dailyTargetHours = prefs.getFloat("daily_target_hours", 3f),
+            notificationsEnabled = prefs.getBoolean("notifications_enabled", true),
+            soundEnabled = prefs.getBoolean("sound_enabled", true)
+        )
+    }
+}
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,23 +107,52 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             CapibaraAndroidTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    DigitalWellbeingScreen(
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                val navController = rememberNavController()
+                
+                NavHost(
+                    navController = navController,
+                    startDestination = "sanctuary"
+                ) {
+                    composable("sanctuary") {
+                        CapybaraSanctuaryScreen(navController = navController)
+                    }
+                    composable("settings") {
+                        SettingsScreen(navController = navController)
+                    }
                 }
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DigitalWellbeingScreen(modifier: Modifier = Modifier) {
+fun CapybaraSanctuaryScreen(navController: NavController) {
     val context = LocalContext.current
+    val settingsManager = remember { SettingsManager(context) }
+    
     var hasPermission by remember { mutableStateOf(false) }
     var screenTimeData by remember { mutableStateOf<DailyScreenTime?>(null) }
     var isLoading by remember { mutableStateOf(false) }
+    var capybaras by remember { mutableStateOf(generateDailyCapybaras()) }
+    var userSettings by remember { mutableStateOf(settingsManager.loadSettings()) }
+    var animationTime by remember { mutableStateOf(0f) }
+    var selectedCapybara by remember { mutableStateOf<Int?>(null) }
     
+    // Continuous animation for living capybaras
+    LaunchedEffect(Unit) {
+        while (true) {
+            animationTime += 0.05f
+            delay(50)
+        }
+    }
+    
+    // Load settings on start
+    LaunchedEffect(Unit) {
+        userSettings = settingsManager.loadSettings()
+    }
+    
+    // Check for permission and get screen time
     LaunchedEffect(Unit) {
         hasPermission = PermissionHelper.hasUsageStatsPermission(context)
         if (hasPermission) {
@@ -70,378 +161,930 @@ fun DigitalWellbeingScreen(modifier: Modifier = Modifier) {
                 val manager = ScreenTimeManager(context)
                 screenTimeData = manager.getDailyScreenTime()
             } catch (e: Exception) {
-                // Handle error
+                // Handle error gracefully
             } finally {
                 isLoading = false
             }
         }
     }
     
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(20.dp)
-    ) {
-        // Ghibli-inspired header with gentle curves
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 24.dp),
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer
-            ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(32.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // Gentle circular icon background
-                Box(
-                    modifier = Modifier
-                        .size(80.dp)
-                        .background(
-                            MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                            CircleShape
-                        )
-                        .border(
-                            2.dp,
-                            MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
-                            CircleShape
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Home,
-                        contentDescription = null,
-                        modifier = Modifier.size(40.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
+    // Update capybaras based on screen time and user settings
+    LaunchedEffect(screenTimeData, userSettings) {
+        screenTimeData?.let { data ->
+            val hoursUsed = (data.totalScreenTime / (1000 * 60 * 60)).toFloat()
+            val capybarasToKill = ((hoursUsed / userSettings.dailyTargetHours) * 30).toInt()
+            capybaras = updateCapybarasBasedOnUsage(capybaras, capybarasToKill, hoursUsed, userSettings.dailyTargetHours)
+        }
+    }
+    
+    // Auto-refresh every minute
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(60000) // 1 minute
+            if (hasPermission) {
+                try {
+                    val manager = ScreenTimeManager(context)
+                    screenTimeData = manager.getDailyScreenTime()
+                } catch (e: Exception) {
+                    // Handle error
                 }
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = "Digital Wellbeing",
-                    style = MaterialTheme.typography.headlineLarge,
-                    fontWeight = FontWeight.Light,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "Find peace in your digital journey",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
-                    fontWeight = FontWeight.Light
-                )
             }
         }
-        
-        if (!hasPermission) {
-            PermissionRequestCard(
-                onRequestPermission = {
-                    PermissionHelper.requestUsageStatsPermission(context)
-                }
+    }
+    
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { 
+                    Text(
+                        "🌸 Capybara Sanctuary",
+                        fontWeight = FontWeight.Light,
+                        fontSize = 22.sp,
+                        color = MaterialTheme.colorScheme.primary
+                    ) 
+                },
+                actions = {
+                    IconButton(
+                        onClick = { navController.navigate("settings") },
+                        modifier = Modifier
+                            .size(48.dp)
+                            .background(
+                                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
+                                CircleShape
+                            )
+                    ) {
+                        Icon(
+                            Icons.Default.Settings,
+                            contentDescription = "Settings",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent
+                )
             )
-        } else if (isLoading) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+        }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            MaterialTheme.colorScheme.background,
+                            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.15f),
+                            MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.1f),
+                            MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.05f)
+                        )
+                    )
+                )
+        ) {
+            // Enhanced background with parallax
+            Image(
+                painter = painterResource(id = R.drawable.sunset_wide_1536_1024_ghibly),
+                contentDescription = "Peaceful background",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .alpha(0.2f)
+                    .scale(1.1f),
+                contentScale = androidx.compose.ui.layout.ContentScale.Crop
+            )
+            
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(32.dp),
+                contentPadding = PaddingValues(vertical = 24.dp)
             ) {
-                CircularProgressIndicator()
+                item {
+                    if (!hasPermission) {
+                        EnhancedPermissionCard {
+                            PermissionHelper.requestUsageStatsPermission(context)
+                        }
+                    } else {
+                        BeautifulSanctuaryHeader(
+                            capybaras = capybaras,
+                            screenTimeData = screenTimeData,
+                            userSettings = userSettings,
+                            isLoading = isLoading,
+                            animationTime = animationTime
+                        )
+                    }
+                }
+                
+                if (hasPermission) {
+                    item {
+                        InteractiveCapybaraGrid(
+                            capybaras = capybaras,
+                            animationTime = animationTime,
+                            selectedCapybara = selectedCapybara,
+                            onCapybaraClick = { capybaraId ->
+                                selectedCapybara = if (selectedCapybara == capybaraId) null else capybaraId
+                            }
+                        )
+                    }
+                    
+                    item {
+                        BeautifulWellnessInsights(
+                            screenTimeData = screenTimeData,
+                            capybaras = capybaras,
+                            userSettings = userSettings,
+                            animationTime = animationTime
+                        )
+                    }
+                }
             }
-        } else {
-            screenTimeData?.let { data ->
-                ScreenTimeContent(data = data)
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SettingsScreen(navController: NavController) {
+    val context = LocalContext.current
+    val settingsManager = remember { SettingsManager(context) }
+    
+    var userSettings by remember { mutableStateOf(settingsManager.loadSettings()) }
+    var targetHours by remember { mutableStateOf(userSettings.dailyTargetHours) }
+    var showSaveSuccess by remember { mutableStateOf(false) }
+    
+    // Auto-hide success message
+    LaunchedEffect(showSaveSuccess) {
+        if (showSaveSuccess) {
+            delay(2000)
+            showSaveSuccess = false
+        }
+    }
+    
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { 
+                    Text(
+                        "Settings", 
+                        fontWeight = FontWeight.Light,
+                        fontSize = 22.sp,
+                        color = MaterialTheme.colorScheme.primary
+                    ) 
+                },
+                navigationIcon = {
+                    IconButton(
+                        onClick = { navController.popBackStack() },
+                        modifier = Modifier
+                            .size(48.dp)
+                            .background(
+                                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
+                                CircleShape
+                            )
+                    ) {
+                        Icon(
+                            Icons.Default.ArrowBack, 
+                            contentDescription = "Back",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent
+                )
+            )
+        }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            MaterialTheme.colorScheme.background,
+                            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.1f)
+                        )
+                    )
+                )
+        ) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp)
+            ) {
+                item {
+                    BeautifulSettingsCard(
+                        title = "🎯 Daily Screen Time Goal",
+                        description = "Set your ideal daily screen time to keep your capybaras happy",
+                        color = MaterialTheme.colorScheme.primary
+                    ) {
+                        Column {
+                            Text(
+                                text = "${String.format("%.1f", targetHours)} hours",
+                                style = MaterialTheme.typography.headlineMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            
+                            Spacer(modifier = Modifier.height(16.dp))
+                            
+                            Slider(
+                                value = targetHours,
+                                onValueChange = { targetHours = it },
+                                valueRange = 1f..8f,
+                                steps = 13,
+                                colors = SliderDefaults.colors(
+                                    thumbColor = MaterialTheme.colorScheme.primary,
+                                    activeTrackColor = MaterialTheme.colorScheme.primary,
+                                    inactiveTrackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+                                ),
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            
+                            Spacer(modifier = Modifier.height(20.dp))
+                            
+                            Button(
+                                onClick = {
+                                    userSettings = userSettings.copy(dailyTargetHours = targetHours)
+                                    settingsManager.saveSettings(userSettings)
+                                    showSaveSuccess = true
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(56.dp)
+                                    .shadow(8.dp, RoundedCornerShape(16.dp)),
+                                shape = RoundedCornerShape(16.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.primary
+                                )
+                            ) {
+                                Text(
+                                    if (showSaveSuccess) "✓ Saved!" else "Save Goal",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                        }
+                    }
+                }
+                
+                item {
+                    BeautifulSettingsCard(
+                        title = "🔔 Notifications",
+                        description = "Customize your gentle reminders",
+                        color = MaterialTheme.colorScheme.secondary
+                    ) {
+                        Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
+                            SettingsToggle(
+                                title = "Gentle Reminders",
+                                description = "Get notified when capybaras need rest",
+                                checked = userSettings.notificationsEnabled,
+                                onCheckedChange = { 
+                                    userSettings = userSettings.copy(notificationsEnabled = it)
+                                    settingsManager.saveSettings(userSettings)
+                                }
+                            )
+                            
+                            SettingsToggle(
+                                title = "Sound Effects",
+                                description = "Peaceful sounds for interactions",
+                                checked = userSettings.soundEnabled,
+                                onCheckedChange = { 
+                                    userSettings = userSettings.copy(soundEnabled = it)
+                                    settingsManager.saveSettings(userSettings)
+                                }
+                            )
+                        }
+                    }
+                }
+                
+                item {
+                    BeautifulSettingsCard(
+                        title = "🌱 About Capybara Sanctuary",
+                        description = "Learn about your digital wellness journey",
+                        color = MaterialTheme.colorScheme.tertiary
+                    ) {
+                        Text(
+                            text = "Each day you receive 30 adorable capybaras. The more you use your phone beyond your daily goal, the more capybaras need to rest. Find balance and keep your digital friends happy! 🌸\n\nTap on capybaras to interact with them and see their moods change based on your digital wellness.",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                            lineHeight = 24.sp
+                        )
+                    }
+                }
             }
         }
     }
 }
 
 @Composable
-fun PermissionRequestCard(onRequestPermission: () -> Unit) {
+fun BeautifulSettingsCard(
+    title: String,
+    description: String,
+    color: Color,
+    content: @Composable () -> Unit
+) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(12.dp, RoundedCornerShape(24.dp)),
+        shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)
+        )
     ) {
         Column(
-            modifier = Modifier.padding(28.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.padding(28.dp)
         ) {
-            // Gentle circular background for icon
-            Box(
-                modifier = Modifier
-                    .size(72.dp)
-                    .background(
-                        MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f),
-                        CircleShape
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Settings,
-                    contentDescription = null,
-                    modifier = Modifier.size(36.dp),
-                    tint = MaterialTheme.colorScheme.secondary
-                )
-            }
-            Spacer(modifier = Modifier.height(20.dp))
             Text(
-                text = "Let's Get Started",
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Light,
-                color = MaterialTheme.colorScheme.secondary
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = color
             )
-            Spacer(modifier = Modifier.height(12.dp))
-            Text(
-                text = "To create your peaceful digital wellness journey, we need permission to view your app usage. This helps us show you gentle insights about your screen time habits.",
-                style = MaterialTheme.typography.bodyLarge,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f),
-                fontWeight = FontWeight.Light,
-                lineHeight = MaterialTheme.typography.bodyLarge.lineHeight * 1.3f
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-            Button(
-                onClick = onRequestPermission,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
-                shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.secondary
-                )
-            ) {
-                Text(
-                    "Continue Journey",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun ScreenTimeContent(data: DailyScreenTime) {
-    val manager = ScreenTimeManager(LocalContext.current)
-    
-    // Animated screen time counter
-    val targetMinutes = (data.totalScreenTime / (1000 * 60)).toInt()
-    var animatedMinutes by remember { mutableStateOf(0) }
-    
-    LaunchedEffect(targetMinutes) {
-        val duration = 1500 // 1.5 seconds
-        val steps = 60
-        val stepDelay = duration / steps
-        val increment = targetMinutes / steps
-        
-        for (i in 0..steps) {
-            animatedMinutes = (increment * i).coerceAtMost(targetMinutes)
-            delay(stepDelay.toLong())
-        }
-        animatedMinutes = targetMinutes
-    }
-    
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(20.dp) // Increased spacing
-    ) {
-        // Total screen time card with gentle design and animation
-        item {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.tertiaryContainer
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(28.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "Today's Journey",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.8f),
-                        fontWeight = FontWeight.Light
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text(
-                        text = manager.formatTime(animatedMinutes * 60 * 1000L),
-                        style = MaterialTheme.typography.displayMedium,
-                        fontWeight = FontWeight.Light,
-                        color = MaterialTheme.colorScheme.tertiary
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "of mindful screen time",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.7f),
-                        fontWeight = FontWeight.Light
-                    )
-                }
-            }
-        }
-        
-        // Apps header with gentle styling
-        item {
+            
             Spacer(modifier = Modifier.height(8.dp))
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 4.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(32.dp)
-                        .background(
-                            MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                            CircleShape
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Menu,
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
-                Spacer(modifier = Modifier.width(12.dp))
-                Text(
-                    text = "Most Used Apps Today",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Light,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-        }
-        
-        // App usage list with gentle spacing
-        items(data.appUsageList.take(10)) { appUsage ->
-            AppUsageCard(appUsage = appUsage, manager = manager)
-        }
-        
-        // Bottom padding for better scrolling
-        item {
-            Spacer(modifier = Modifier.height(16.dp))
+            
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                lineHeight = 20.sp
+            )
+            
+            Spacer(modifier = Modifier.height(24.dp))
+            
+            content()
         }
     }
 }
 
 @Composable
-fun AppUsageCard(appUsage: AppUsage, manager: ScreenTimeManager) {
-    val context = LocalContext.current
-    val appIcon = remember(appUsage.packageName) {
-        manager.getAppIcon(appUsage.packageName)
+fun SettingsToggle(
+    title: String,
+    description: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            )
+        }
+        
+        Switch(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = MaterialTheme.colorScheme.primary,
+                checkedTrackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+            )
+        )
     }
+}
+
+@Composable
+fun BeautifulSanctuaryHeader(
+    capybaras: List<Capybara>,
+    screenTimeData: DailyScreenTime?,
+    userSettings: UserSettings,
+    isLoading: Boolean,
+    animationTime: Float
+) {
+    val aliveCount = capybaras.count { it.isAlive }
+    val restingCount = capybaras.count { !it.isAlive }
+    
+    val healthPercentage = (aliveCount / 30f)
+    val healthColor by animateColorAsState(
+        targetValue = when {
+            healthPercentage >= 0.8f -> MaterialTheme.colorScheme.primary
+            healthPercentage >= 0.5f -> MaterialTheme.colorScheme.tertiary
+            else -> MaterialTheme.colorScheme.error
+        }
+    )
     
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp), // Better tap target spacing
-        shape = RoundedCornerShape(16.dp),
+            .shadow(16.dp, RoundedCornerShape(32.dp)),
+        shape = RoundedCornerShape(32.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.98f)
+        )
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp), // Increased padding for better touch targets
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier.padding(32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Real app icon or fallback
+            // Animated wellness indicator with pulsing effect
+            val pulseScale by animateFloatAsState(
+                targetValue = 1f + sin(animationTime * 2) * 0.05f,
+                animationSpec = tween(100)
+            )
+            
             Box(
                 modifier = Modifier
-                    .size(56.dp)
+                    .size(100.dp)
+                    .scale(pulseScale)
                     .background(
-                        if (appIcon != null) Color.Transparent 
-                        else MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
-                        CircleShape
+                        brush = Brush.radialGradient(
+                            colors = listOf(
+                                healthColor.copy(alpha = 0.2f),
+                                healthColor.copy(alpha = 0.05f)
+                            )
+                        ),
+                        shape = CircleShape
                     )
-                    .border(
-                        if (appIcon != null) 0.dp else 1.dp,
-                        MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
-                        CircleShape
-                    ),
+                    .border(4.dp, healthColor.copy(alpha = 0.4f), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                val iconBitmap = remember(appIcon) {
-                    try {
-                        appIcon?.toBitmap(56, 56)
-                    } catch (e: Exception) {
-                        null
-                    }
-                }
+                Text(
+                    text = when {
+                        healthPercentage >= 0.8f -> "😊"
+                        healthPercentage >= 0.5f -> "😐"
+                        else -> "😰"
+                    },
+                    fontSize = 40.sp
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(24.dp))
+            
+            Text(
+                text = when {
+                    healthPercentage >= 0.8f -> "Sanctuary Thriving"
+                    healthPercentage >= 0.5f -> "Sanctuary Stable"
+                    else -> "Sanctuary Needs Care"
+                },
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Light,
+                color = healthColor,
+                textAlign = TextAlign.Center
+            )
+            
+            Spacer(modifier = Modifier.height(32.dp))
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                BeautifulStatCard(
+                    title = "Happy",
+                    value = aliveCount.toString(),
+                    emoji = "💚",
+                    color = MaterialTheme.colorScheme.primary,
+                    isAnimated = true,
+                    animationTime = animationTime
+                )
                 
-                if (iconBitmap != null) {
-                    Image(
-                        bitmap = iconBitmap.asImageBitmap(),
-                        contentDescription = appUsage.appName,
-                        modifier = Modifier
-                            .size(56.dp)
-                            .clip(CircleShape)
-                    )
-                } else {
-                    Text(
-                        text = appUsage.appName.take(1).uppercase(),
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Light,
-                        color = MaterialTheme.colorScheme.primary
+                BeautifulStatCard(
+                    title = "Resting",
+                    value = restingCount.toString(),
+                    emoji = "💤",
+                    color = MaterialTheme.colorScheme.secondary,
+                    isAnimated = false,
+                    animationTime = animationTime
+                )
+                
+                screenTimeData?.let { data ->
+                    val hours = (data.totalScreenTime / (1000 * 60 * 60)).toFloat()
+                    BeautifulStatCard(
+                        title = "Screen Time",
+                        value = String.format("%.1fh", hours),
+                        emoji = "📱",
+                        color = if (hours > userSettings.dailyTargetHours) 
+                                MaterialTheme.colorScheme.error 
+                                else MaterialTheme.colorScheme.tertiary,
+                        isAnimated = hours > userSettings.dailyTargetHours,
+                        animationTime = animationTime
                     )
                 }
             }
             
-            Spacer(modifier = Modifier.width(20.dp))
-            
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = appUsage.appName,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Spacer(modifier = Modifier.height(6.dp))
-                Text(
-                    text = manager.formatTime(appUsage.timeInForeground),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
-                    fontWeight = FontWeight.Light
+            if (isLoading) {
+                Spacer(modifier = Modifier.height(24.dp))
+                CircularProgressIndicator(
+                    modifier = Modifier.size(32.dp),
+                    strokeWidth = 4.dp,
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
-            
-            // Gentle time indicator with short format
-            Box(
-                modifier = Modifier
-                    .background(
-                        MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f),
-                        RoundedCornerShape(12.dp)
-                    )
-                    .padding(horizontal = 12.dp, vertical = 8.dp)
+        }
+    }
+}
+
+@Composable
+fun BeautifulStatCard(
+    title: String,
+    value: String,
+    emoji: String,
+    color: Color,
+    isAnimated: Boolean = false,
+    animationTime: Float
+) {
+    val scale by animateFloatAsState(
+        targetValue = if (isAnimated) 1f + sin(animationTime * 3) * 0.1f else 1f,
+        animationSpec = tween(100)
+    )
+    
+    Card(
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = color.copy(alpha = 0.15f)
+        ),
+        modifier = Modifier
+            .shadow(8.dp, RoundedCornerShape(24.dp))
+            .scale(scale)
+    ) {
+        Column(
+            modifier = Modifier.padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = emoji,
+                fontSize = 32.sp
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = value,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = color
+            )
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodySmall,
+                color = color.copy(alpha = 0.8f),
+                fontWeight = FontWeight.Medium
+            )
+        }
+    }
+}
+
+@Composable
+fun InteractiveCapybaraGrid(
+    capybaras: List<Capybara>,
+    animationTime: Float,
+    selectedCapybara: Int?,
+    onCapybaraClick: (Int) -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(16.dp, RoundedCornerShape(28.dp)),
+        shape = RoundedCornerShape(28.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.98f)
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(24.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = manager.formatTimeShort(appUsage.timeInForeground),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.secondary,
+                    text = "Your Capybara Friends",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                
+                Text(
+                    text = "${capybaras.count { it.isAlive }}/30",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(24.dp))
+            
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(6),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.height(400.dp)
+            ) {
+                items(capybaras) { capybara ->
+                    InteractiveCapybaraItem(
+                        capybara = capybara,
+                        animationTime = animationTime,
+                        isSelected = selectedCapybara == capybara.id,
+                        onClick = { onCapybaraClick(capybara.id) }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun InteractiveCapybaraItem(
+    capybara: Capybara,
+    animationTime: Float,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    val scale by animateFloatAsState(
+        targetValue = when {
+            !capybara.isAlive -> 0.6f
+            isSelected -> 1.2f
+            else -> 1f
+        },
+        animationSpec = tween(durationMillis = 800, easing = FastOutSlowInEasing)
+    )
+    
+    val alpha by animateFloatAsState(
+        targetValue = if (capybara.isAlive) 1f else 0.4f,
+        animationSpec = tween(durationMillis = 1000)
+    )
+    
+    // Enhanced floating animation
+    val floatOffset = if (capybara.isAlive) {
+        sin(animationTime * 2 + capybara.animationOffset) * 4f
+    } else 0f
+    
+    val rotation = if (capybara.isAlive && capybara.mood == CapybaraMood.EXCITED) {
+        sin(animationTime * 3 + capybara.animationOffset) * 8f
+    } else 0f
+    
+    val wiggle = if (capybara.isAlive && isSelected) {
+        cos(animationTime * 8) * 2f
+    } else 0f
+    
+    Box(
+        modifier = Modifier
+            .size(60.dp)
+            .offset(
+                y = floatOffset.dp,
+                x = wiggle.dp
+            )
+            .scale(scale)
+            .alpha(alpha)
+            .rotate(rotation)
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        if (capybara.isAlive) {
+            Card(
+                shape = CircleShape,
+                colors = CardDefaults.cardColors(
+                    containerColor = if (isSelected) 
+                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f)
+                        else MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                ),
+                modifier = Modifier.shadow(
+                    elevation = if (isSelected) 12.dp else 4.dp,
+                    shape = CircleShape
+                )
+            ) {
+                Image(
+                    painter = painterResource(id = getCapybaraDrawable(capybara.mood)),
+                    contentDescription = "Capybara ${capybara.id}",
+                    modifier = Modifier
+                        .size(55.dp)
+                        .padding(6.dp)
+                        .clip(CircleShape)
+                )
+            }
+        } else {
+            Text(
+                text = "💤",
+                fontSize = 32.sp,
+                modifier = Modifier.alpha(0.7f)
+            )
+        }
+    }
+}
+
+@Composable
+fun BeautifulWellnessInsights(
+    screenTimeData: DailyScreenTime?,
+    capybaras: List<Capybara>,
+    userSettings: UserSettings,
+    animationTime: Float
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(16.dp, RoundedCornerShape(28.dp)),
+        shape = RoundedCornerShape(28.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.9f)
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(28.dp)
+        ) {
+            Text(
+                text = "🌱 Wellness Insights",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.tertiary
+            )
+            
+            Spacer(modifier = Modifier.height(20.dp))
+            
+            val aliveCount = capybaras.count { it.isAlive }
+            val message = when {
+                aliveCount >= 25 -> "Your capybaras are thriving! You're maintaining excellent digital balance. Keep up the mindful usage! 🌟"
+                aliveCount >= 20 -> "Most of your capybaras are content. You're doing well with your screen time goals. 🌿"
+                aliveCount >= 15 -> "Some capybaras are getting tired. Consider taking more breaks throughout the day. 🍃"
+                aliveCount >= 10 -> "Your capybaras need more rest. Try reducing screen time or taking longer breaks. 🌸"
+                else -> "Your capybaras are very tired. Time for a digital detox to restore balance! 🧘‍♀️"
+            }
+            
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onTertiaryContainer,
+                fontWeight = FontWeight.Light,
+                lineHeight = 28.sp
+            )
+            
+            screenTimeData?.let { data ->
+                Spacer(modifier = Modifier.height(24.dp))
+                val hours = (data.totalScreenTime / (1000 * 60 * 60)).toFloat()
+                val progress = (hours / userSettings.dailyTargetHours).coerceAtMost(1.5f)
+                
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Daily Goal Progress",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onTertiaryContainer
+                    )
+                    
+                    Text(
+                        text = "${String.format("%.1f", hours)}h / ${String.format("%.1f", userSettings.dailyTargetHours)}h",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = if (hours > userSettings.dailyTargetHours) 
+                                MaterialTheme.colorScheme.error 
+                                else MaterialTheme.colorScheme.tertiary
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                LinearProgressIndicator(
+                    progress = progress,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(16.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .shadow(4.dp, RoundedCornerShape(8.dp)),
+                    color = if (progress > 1f) MaterialTheme.colorScheme.error 
+                           else MaterialTheme.colorScheme.tertiary,
+                    trackColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.2f)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun EnhancedPermissionCard(onRequestPermission: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(20.dp, RoundedCornerShape(32.dp)),
+        shape = RoundedCornerShape(32.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.98f)
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(40.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "🌸",
+                fontSize = 80.sp
+            )
+            
+            Spacer(modifier = Modifier.height(24.dp))
+            
+            Text(
+                text = "Welcome to Capybara Sanctuary",
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.Light,
+                color = MaterialTheme.colorScheme.primary,
+                textAlign = TextAlign.Center
+            )
+            
+            Spacer(modifier = Modifier.height(20.dp))
+            
+            Text(
+                text = "To care for your 30 daily capybaras and track your digital wellness journey, we need permission to gently monitor your screen time.",
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                fontWeight = FontWeight.Light,
+                lineHeight = 28.sp
+            )
+            
+            Spacer(modifier = Modifier.height(32.dp))
+            
+            Button(
+                onClick = onRequestPermission,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(64.dp)
+                    .shadow(12.dp, RoundedCornerShape(20.dp)),
+                shape = RoundedCornerShape(20.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
+            ) {
+                Text(
+                    "Begin Sanctuary Journey",
+                    style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Medium
                 )
             }
         }
+    }
+}
+
+// Helper functions
+fun generateDailyCapybaras(): List<Capybara> {
+    return (1..30).map { id ->
+        Capybara(
+            id = id,
+            isAlive = true,
+            mood = CapybaraMood.values().random(),
+            animationOffset = Random.nextFloat() * 1000f
+        )
+    }
+}
+
+fun updateCapybarasBasedOnUsage(
+    capybaras: List<Capybara>,
+    capybarasToKill: Int,
+    hoursUsed: Float,
+    targetHours: Float
+): List<Capybara> {
+    val aliveCapybaras = capybaras.filter { it.isAlive }
+    val deadCapybaras = capybaras.filter { !it.isAlive }
+    
+    val actualKillCount = max(0, capybarasToKill.coerceAtMost(aliveCapybaras.size))
+    
+    // Update moods based on usage
+    val updatedAlive = aliveCapybaras.map { capybara ->
+        val newMood = when {
+            hoursUsed < targetHours * 0.5f -> CapybaraMood.EXCITED
+            hoursUsed < targetHours * 0.8f -> CapybaraMood.HAPPY
+            hoursUsed < targetHours -> CapybaraMood.CONTENT
+            hoursUsed < targetHours * 1.2f -> CapybaraMood.WORRIED
+            else -> CapybaraMood.ANGRY
+        }
+        capybara.copy(mood = newMood)
+    }
+    
+    val newlyDead = updatedAlive.take(actualKillCount).map { it.copy(isAlive = false) }
+    val stillAlive = updatedAlive.drop(actualKillCount)
+    
+    return stillAlive + newlyDead + deadCapybaras
+}
+
+fun getCapybaraDrawable(mood: CapybaraMood): Int {
+    return when (mood) {
+        CapybaraMood.HAPPY, CapybaraMood.EXCITED -> R.drawable.capybara_cartoon_style_sitting_happy_drinking_boba_tea_with_hearts_facing_forward_solo
+        CapybaraMood.CONTENT, CapybaraMood.PEACEFUL -> R.drawable.capybara_cartoon_style_sitting_content_happy__eating_lettuce_with_heart_facing_left_solo
+        CapybaraMood.SLEEPY -> R.drawable.capybara_cartoon_style_sleeping_curled_up_with_zzz_facing_right_solo
+        CapybaraMood.WORRIED -> R.drawable.capybara_cartoon_style_sitting_confused_bread_costume_eyes_closed_question_mark_facing_left_solo
+        CapybaraMood.ANGRY -> R.drawable.capybara_cartoon_style_sitting_annoyed_holding_knife_steam_angry_face_facing_right_solo
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun DigitalWellbeingPreview() {
+fun CapybaraSanctuaryPreview() {
     CapibaraAndroidTheme {
-        DigitalWellbeingScreen()
+        val navController = rememberNavController()
+        CapybaraSanctuaryScreen(navController = navController)
     }
 }
