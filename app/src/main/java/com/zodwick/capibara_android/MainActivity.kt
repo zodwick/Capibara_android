@@ -46,6 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -198,9 +199,10 @@ fun CapybaraSanctuaryScreen(navController: NavController) {
                 title = { 
                     Text(
                         "🌸 Capybara Sanctuary",
-                        fontWeight = FontWeight.Light,
+                        fontFamily = FontFamily.Serif,
+                        fontWeight = FontWeight.Medium,
                         fontSize = 22.sp,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.onSurface
                     ) 
                 },
                 actions = {
@@ -326,9 +328,10 @@ fun SettingsScreen(navController: NavController) {
                 title = { 
                     Text(
                         "Settings", 
-                        fontWeight = FontWeight.Light,
+                        fontFamily = FontFamily.Serif,
+                        fontWeight = FontWeight.Medium,
                         fontSize = 22.sp,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.onSurface
                     ) 
                 },
                 navigationIcon = {
@@ -383,9 +386,10 @@ fun SettingsScreen(navController: NavController) {
                         Column {
                             Text(
                                 text = "${String.format("%.1f", targetHours)} hours",
+                                fontFamily = FontFamily.SansSerif,
                                 style = MaterialTheme.typography.headlineMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                             
                             Spacer(modifier = Modifier.height(16.dp))
@@ -468,6 +472,7 @@ fun SettingsScreen(navController: NavController) {
                     ) {
                         Text(
                             text = "Each day you receive 30 adorable capybaras. The more you use your phone beyond your daily goal, the more capybaras need to rest. Find balance and keep your digital friends happy! 🌸\n\nTap on capybaras to interact with them and see their moods change based on your digital wellness.",
+                            fontFamily = FontFamily.SansSerif,
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                             lineHeight = 24.sp
@@ -500,17 +505,19 @@ fun BeautifulSettingsCard(
         ) {
             Text(
                 text = title,
+                fontFamily = FontFamily.Serif,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
-                color = color
+                color = MaterialTheme.colorScheme.onSurface
             )
             
             Spacer(modifier = Modifier.height(8.dp))
             
             Text(
                 text = description,
+                fontFamily = FontFamily.SansSerif,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                 lineHeight = 20.sp
             )
             
@@ -536,14 +543,16 @@ fun SettingsToggle(
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title,
+                fontFamily = FontFamily.SansSerif,
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
                 text = description,
+                fontFamily = FontFamily.SansSerif,
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
             )
         }
         
@@ -631,9 +640,10 @@ fun BeautifulSanctuaryHeader(
                     healthPercentage >= 0.5f -> "Sanctuary Stable"
                     else -> "Sanctuary Needs Care"
                 },
+                fontFamily = FontFamily.Serif,
                 style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Light,
-                color = healthColor,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center
             )
             
@@ -662,15 +672,20 @@ fun BeautifulSanctuaryHeader(
                 )
                 
                 screenTimeData?.let { data ->
-                    val hours = (data.totalScreenTime / (1000 * 60 * 60)).toFloat()
+                    val totalMinutes = (data.totalScreenTime / (1000 * 60)).toInt()
+                    val hours = totalMinutes / 60
+                    val minutes = totalMinutes % 60
+                    val timeString = if (hours > 0) "${hours}h ${minutes}m" else "${minutes}m"
+                    val targetMinutes = (userSettings.dailyTargetHours * 60).toInt()
+                    
                     BeautifulStatCard(
                         title = "Screen Time",
-                        value = String.format("%.1fh", hours),
+                        value = timeString,
                         emoji = "📱",
-                        color = if (hours > userSettings.dailyTargetHours) 
+                        color = if (totalMinutes > targetMinutes) 
                                 MaterialTheme.colorScheme.error 
                                 else MaterialTheme.colorScheme.tertiary,
-                        isAnimated = hours > userSettings.dailyTargetHours,
+                        isAnimated = totalMinutes > targetMinutes,
                         animationTime = animationTime
                     )
                 }
@@ -697,42 +712,29 @@ fun BeautifulStatCard(
     isAnimated: Boolean = false,
     animationTime: Float
 ) {
-    val scale by animateFloatAsState(
-        targetValue = if (isAnimated) 1f + sin(animationTime * 3) * 0.1f else 1f,
-        animationSpec = tween(100)
-    )
-    
-    Card(
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = color.copy(alpha = 0.15f)
-        ),
-        modifier = Modifier
-            .shadow(8.dp, RoundedCornerShape(24.dp))
-            .scale(scale)
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(8.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = emoji,
-                fontSize = 32.sp
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            Text(
-                text = value,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = color
-            )
-            Text(
-                text = title,
-                style = MaterialTheme.typography.bodySmall,
-                color = color.copy(alpha = 0.8f),
-                fontWeight = FontWeight.Medium
-            )
-        }
+        Text(
+            text = emoji,
+            fontSize = 24.sp
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = value,
+            fontFamily = FontFamily.SansSerif,
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Text(
+            text = title,
+            fontFamily = FontFamily.SansSerif,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+            fontWeight = FontWeight.Normal
+        )
     }
 }
 
@@ -762,16 +764,18 @@ fun InteractiveCapybaraGrid(
             ) {
                 Text(
                     text = "Your Capybara Friends",
+                    fontFamily = FontFamily.Serif,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 
                 Text(
                     text = "${capybaras.count { it.isAlive }}/30",
+                    fontFamily = FontFamily.SansSerif,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                 )
             }
             
@@ -896,9 +900,10 @@ fun BeautifulWellnessInsights(
         ) {
             Text(
                 text = "🌱 Wellness Insights",
+                fontFamily = FontFamily.Serif,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.tertiary
+                color = MaterialTheme.colorScheme.onSurface
             )
             
             Spacer(modifier = Modifier.height(20.dp))
@@ -914,16 +919,18 @@ fun BeautifulWellnessInsights(
             
             Text(
                 text = message,
+                fontFamily = FontFamily.SansSerif,
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onTertiaryContainer,
-                fontWeight = FontWeight.Light,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Normal,
                 lineHeight = 28.sp
             )
             
             screenTimeData?.let { data ->
                 Spacer(modifier = Modifier.height(24.dp))
-                val hours = (data.totalScreenTime / (1000 * 60 * 60)).toFloat()
-                val progress = (hours / userSettings.dailyTargetHours).coerceAtMost(1.5f)
+                val totalMinutes = (data.totalScreenTime / (1000 * 60)).toInt()
+                val targetMinutes = (userSettings.dailyTargetHours * 60).toInt()
+                val progress = (totalMinutes.toFloat() / targetMinutes.toFloat()).coerceAtMost(1.5f)
                 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -932,18 +939,20 @@ fun BeautifulWellnessInsights(
                 ) {
                     Text(
                         text = "Daily Goal Progress",
+                        fontFamily = FontFamily.SansSerif,
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onTertiaryContainer
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     
                     Text(
-                        text = "${String.format("%.1f", hours)}h / ${String.format("%.1f", userSettings.dailyTargetHours)}h",
+                        text = "${totalMinutes}m / ${targetMinutes}m",
+                        fontFamily = FontFamily.SansSerif,
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
-                        color = if (hours > userSettings.dailyTargetHours) 
+                        color = if (totalMinutes > targetMinutes) 
                                 MaterialTheme.colorScheme.error 
-                                else MaterialTheme.colorScheme.tertiary
+                                else MaterialTheme.colorScheme.onSurface
                     )
                 }
                 
@@ -956,7 +965,7 @@ fun BeautifulWellnessInsights(
                         .height(16.dp)
                         .clip(RoundedCornerShape(8.dp))
                         .shadow(4.dp, RoundedCornerShape(8.dp)),
-                    color = if (progress > 1f) MaterialTheme.colorScheme.error 
+                    color = if (totalMinutes > targetMinutes) MaterialTheme.colorScheme.error 
                            else MaterialTheme.colorScheme.tertiary,
                     trackColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.2f)
                 )
@@ -989,9 +998,10 @@ fun EnhancedPermissionCard(onRequestPermission: () -> Unit) {
             
             Text(
                 text = "Welcome to Capybara Sanctuary",
+                fontFamily = FontFamily.Serif,
                 style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Light,
-                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center
             )
             
@@ -999,10 +1009,11 @@ fun EnhancedPermissionCard(onRequestPermission: () -> Unit) {
             
             Text(
                 text = "To care for your 30 daily capybaras and track your digital wellness journey, we need permission to gently monitor your screen time.",
+                fontFamily = FontFamily.SansSerif,
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
-                fontWeight = FontWeight.Light,
+                fontWeight = FontWeight.Normal,
                 lineHeight = 28.sp
             )
             
