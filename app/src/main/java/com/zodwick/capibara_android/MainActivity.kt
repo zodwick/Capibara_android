@@ -208,14 +208,14 @@ fun CapybaraSanctuaryScreen(navController: NavController) {
                 actions = {
                     IconButton(
                         onClick = { navController.navigate("settings") },
-                        modifier = Modifier
+            modifier = Modifier
                             .size(48.dp)
-                            .background(
+                        .background(
                                 MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
-                                CircleShape
-                            )
-                    ) {
-                        Icon(
+                            CircleShape
+                        )
+                ) {
+                    Icon(
                             Icons.Default.Settings,
                             contentDescription = "Settings",
                             tint = MaterialTheme.colorScheme.primary,
@@ -262,17 +262,28 @@ fun CapybaraSanctuaryScreen(navController: NavController) {
                 verticalArrangement = Arrangement.spacedBy(32.dp),
                 contentPadding = PaddingValues(vertical = 24.dp)
             ) {
-                item {
-                    if (!hasPermission) {
+                                item {
+        if (!hasPermission) {
                         EnhancedPermissionCard {
-                            PermissionHelper.requestUsageStatsPermission(context)
-                        }
+                    PermissionHelper.requestUsageStatsPermission(context)
+                }
                     } else {
                         BeautifulSanctuaryHeader(
                             capybaras = capybaras,
                             screenTimeData = screenTimeData,
                             userSettings = userSettings,
                             isLoading = isLoading,
+                            animationTime = animationTime
+                        )
+                    }
+                }
+                
+                if (hasPermission) {
+                    item {
+                        SanctuaryStatsCard(
+                            capybaras = capybaras,
+                            screenTimeData = screenTimeData,
+                            userSettings = userSettings,
                             animationTime = animationTime
                         )
                     }
@@ -337,14 +348,14 @@ fun SettingsScreen(navController: NavController) {
                 navigationIcon = {
                     IconButton(
                         onClick = { navController.popBackStack() },
-                        modifier = Modifier
+                modifier = Modifier
                             .size(48.dp)
-                            .background(
+                    .background(
                                 MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
-                            CircleShape
+                        CircleShape
                             )
-                ) {
-                    Icon(
+            ) {
+                Icon(
                             Icons.Default.ArrowBack, 
                             contentDescription = "Back",
                             tint = MaterialTheme.colorScheme.primary,
@@ -384,7 +395,7 @@ fun SettingsScreen(navController: NavController) {
                         color = MaterialTheme.colorScheme.primary
                     ) {
                         Column {
-                            Text(
+            Text(
                                 text = "${String.format("%.1f", targetHours)} hours",
                                 fontFamily = FontFamily.SansSerif,
                                 style = MaterialTheme.typography.headlineMedium,
@@ -409,31 +420,31 @@ fun SettingsScreen(navController: NavController) {
                             
                             Spacer(modifier = Modifier.height(20.dp))
                             
-                            Button(
+            Button(
                                 onClick = {
                                     userSettings = userSettings.copy(dailyTargetHours = targetHours)
                                     settingsManager.saveSettings(userSettings)
                                     showSaveSuccess = true
                                 },
-                                modifier = Modifier
-                                    .fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                                     .height(56.dp)
                                     .shadow(8.dp, RoundedCornerShape(16.dp)),
-                                shape = RoundedCornerShape(16.dp),
-                                colors = ButtonDefaults.buttonColors(
+                shape = RoundedCornerShape(16.dp),
+                colors = ButtonDefaults.buttonColors(
                                     containerColor = MaterialTheme.colorScheme.primary
-                                )
-                            ) {
-                                Text(
+                )
+            ) {
+                Text(
                                     if (showSaveSuccess) "✓ Saved!" else "Save Goal",
                                     fontSize = 16.sp,
-                                    fontWeight = FontWeight.Medium
-                                )
-                            }
-                        }
-                    }
-                }
-                
+                    fontWeight = FontWeight.Medium
+                )
+            }
+        }
+    }
+}
+
                 item {
                     BeautifulSettingsCard(
                         title = "🔔 Notifications",
@@ -491,32 +502,32 @@ fun BeautifulSettingsCard(
     color: Color,
     content: @Composable () -> Unit
 ) {
-    Card(
+            Card(
         modifier = Modifier
             .fillMaxWidth()
             .shadow(12.dp, RoundedCornerShape(24.dp)),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(
+                colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)
         )
-    ) {
-        Column(
+            ) {
+                Column(
             modifier = Modifier.padding(28.dp)
-        ) {
-            Text(
+                ) {
+                    Text(
                 text = title,
                 fontFamily = FontFamily.Serif,
-                style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
             )
             
-            Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
             
-            Text(
+                    Text(
                 text = description,
                 fontFamily = FontFamily.SansSerif,
-                style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                 lineHeight = 20.sp
             )
@@ -587,132 +598,52 @@ fun BeautifulSanctuaryHeader(
         }
     )
     
+        // Main capybara card with white background
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
             .shadow(16.dp, RoundedCornerShape(32.dp)),
         shape = RoundedCornerShape(32.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.98f)
+            containerColor = Color.White
         )
     ) {
         Column(
-            modifier = Modifier.padding(32.dp),
+            modifier = Modifier.padding(40.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-                        // Animated wellness indicator with pulsing effect
-            val pulseScale by animateFloatAsState(
-                targetValue = 1f + sin(animationTime * 2) * 0.05f,
-                animationSpec = tween(100)
-            )
-            
+                        // Enlarged capybara without animation
             Box(
                 modifier = Modifier
-                    .size(120.dp)
-                    .scale(pulseScale),
+                    .fillMaxWidth()
+                    .height(160.dp),
                 contentAlignment = Alignment.Center
             ) {
-                // Background circle with health color
-                Box(
+                Image(
+                    painter = painterResource(id = getSanctuaryWellnessCapybara(healthPercentage)),
+                    contentDescription = "Sanctuary wellness indicator",
                     modifier = Modifier
-                        .size(100.dp)
-                        .background(
-                            brush = Brush.radialGradient(
-                                colors = listOf(
-                                    healthColor.copy(alpha = 0.2f),
-                                    healthColor.copy(alpha = 0.05f)
-                                )
-                            ),
-                            shape = CircleShape
-                        )
-                        .border(4.dp, healthColor.copy(alpha = 0.4f), CircleShape)
+                        .size(150.dp)
+                        .clip(CircleShape),
+                    contentScale = androidx.compose.ui.layout.ContentScale.Fit
                 )
-                
-                // Capybara image with better white background handling
-                Box(
-                    modifier = Modifier
-                        .size(90.dp)
-                        .clip(CircleShape)
-                        .background(
-                            brush = Brush.radialGradient(
-                                colors = listOf(
-                                    Color.White,
-                                    Color.White.copy(alpha = 0.9f)
-                                )
-                            )
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Image(
-                        painter = painterResource(id = getSanctuaryWellnessCapybara(healthPercentage)),
-                        contentDescription = "Sanctuary wellness indicator",
-                        modifier = Modifier
-                            .size(85.dp)
-                            .clip(CircleShape),
-                        contentScale = androidx.compose.ui.layout.ContentScale.Crop
-                    )
-                }
             }
             
             Spacer(modifier = Modifier.height(24.dp))
             
-                            Text(
+                Text(
                 text = when {
-                    healthPercentage >= 0.8f -> "Sanctuary in Perfect Harmony"
-                    healthPercentage >= 0.5f -> "Sanctuary Needs Attention"
-                    healthPercentage >= 0.2f -> "Sanctuary in Distress"
-                    else -> "Sanctuary in Crisis"
+                    healthPercentage >= 0.8f -> "Perfect Harmony"
+                    healthPercentage >= 0.5f -> "Needs Attention"
+                    healthPercentage >= 0.2f -> "In Distress"
+                    else -> "In Crisis"
                 },
                 fontFamily = FontFamily.Serif,
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Medium,
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center
             )
-            
-            Spacer(modifier = Modifier.height(32.dp))
-            
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                BeautifulStatCard(
-                    title = "Happy",
-                    value = aliveCount.toString(),
-                    emoji = "💚",
-                    color = MaterialTheme.colorScheme.primary,
-                    isAnimated = true,
-                    animationTime = animationTime
-                )
-                
-                BeautifulStatCard(
-                    title = "Resting",
-                    value = restingCount.toString(),
-                    emoji = "💤",
-                    color = MaterialTheme.colorScheme.secondary,
-                    isAnimated = false,
-                    animationTime = animationTime
-                )
-                
-                screenTimeData?.let { data ->
-                    val totalMinutes = (data.totalScreenTime / (1000 * 60)).toInt()
-                    val hours = totalMinutes / 60
-                    val minutes = totalMinutes % 60
-                    val timeString = if (hours > 0) "${hours}h ${minutes}m" else "${minutes}m"
-                    val targetMinutes = (userSettings.dailyTargetHours * 60).toInt()
-                    
-                    BeautifulStatCard(
-                        title = "Screen Time",
-                        value = timeString,
-                        emoji = "📱",
-                        color = if (totalMinutes > targetMinutes) 
-                                MaterialTheme.colorScheme.error 
-                                else MaterialTheme.colorScheme.tertiary,
-                        isAnimated = totalMinutes > targetMinutes,
-                        animationTime = animationTime
-                    )
-                }
-            }
             
             if (isLoading) {
                 Spacer(modifier = Modifier.height(24.dp))
@@ -720,6 +651,71 @@ fun BeautifulSanctuaryHeader(
                     modifier = Modifier.size(32.dp),
                     strokeWidth = 4.dp,
                     color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun SanctuaryStatsCard(
+    capybaras: List<Capybara>,
+    screenTimeData: DailyScreenTime?,
+    userSettings: UserSettings,
+    animationTime: Float
+) {
+    val aliveCount = capybaras.count { it.isAlive }
+    val restingCount = capybaras.count { !it.isAlive }
+    
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(12.dp, RoundedCornerShape(24.dp)),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            BeautifulStatCard(
+                title = "Happy",
+                value = aliveCount.toString(),
+                emoji = "💚",
+                color = MaterialTheme.colorScheme.primary,
+                isAnimated = true,
+                animationTime = animationTime
+            )
+            
+            BeautifulStatCard(
+                title = "Resting",
+                value = restingCount.toString(),
+                emoji = "💤",
+                color = MaterialTheme.colorScheme.secondary,
+                isAnimated = false,
+                animationTime = animationTime
+            )
+            
+            screenTimeData?.let { data ->
+                val totalMinutes = (data.totalScreenTime / (1000 * 60)).toInt()
+                val hours = totalMinutes / 60
+                val minutes = totalMinutes % 60
+                val timeString = if (hours > 0) "${hours}h ${minutes}m" else "${minutes}m"
+                val targetMinutes = (userSettings.dailyTargetHours * 60).toInt()
+                
+                BeautifulStatCard(
+                    title = "Screen Time",
+                    value = timeString,
+                    emoji = "📱",
+                    color = if (totalMinutes > targetMinutes) 
+                            MaterialTheme.colorScheme.error 
+                            else MaterialTheme.colorScheme.tertiary,
+                    isAnimated = totalMinutes > targetMinutes,
+                    animationTime = animationTime
                 )
             }
         }
@@ -763,28 +759,25 @@ fun BeautifulStatCard(
 
 @Composable
 fun SimpleMoodSummary(capybaras: List<Capybara>) {
-    val aliveCapybaras = capybaras.filter { it.isAlive }
-    val total = aliveCapybaras.size
+    val aliveCount = capybaras.count { it.isAlive }
+    val alivePercentage = (aliveCount / 30f) * 100f
     
-    if (total > 0) {
-        val happyCount = aliveCapybaras.count { it.mood == CapybaraMood.HAPPY || it.mood == CapybaraMood.EXCITED }
-        val worriedCount = aliveCapybaras.count { it.mood == CapybaraMood.WORRIED || it.mood == CapybaraMood.ANGRY }
-        
-        val summaryText = when {
-            happyCount >= total * 0.7f -> "Most capybaras are happy and relaxed 😊"
-            worriedCount >= total * 0.5f -> "Many capybaras are feeling stressed 😟"
-            else -> "Capybaras have mixed feelings about your screen time 😐"
-        }
-        
-        Text(
-            text = summaryText,
-            fontFamily = FontFamily.SansSerif,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
-        )
+    val summaryText = when {
+        alivePercentage >= 80f -> "Your capybaras are thriving! Excellent digital wellness! 🌟"
+        alivePercentage >= 60f -> "Most capybaras are content with your screen time habits 😊"
+        alivePercentage >= 40f -> "Some capybaras are getting tired from screen time 😐"
+        alivePercentage >= 20f -> "Many capybaras need rest - consider reducing screen time 😟"
+        else -> "Your capybaras are exhausted - time for a digital detox! 😰"
     }
+    
+    Text(
+        text = summaryText,
+        fontFamily = FontFamily.SansSerif,
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+        textAlign = TextAlign.Center,
+        modifier = Modifier.fillMaxWidth()
+    )
 }
 
 @Composable
@@ -793,19 +786,19 @@ fun OrganicCapybaraLayout(
     selectedCapybara: Int?,
     onCapybaraClick: (Int) -> Unit
 ) {
-    // Select diverse representatives
-    val representatives = selectDiverseCapybaras(capybaras, 6)
+    // Select representatives - always 5 capybaras with proper alive/resting ratio
+    val representatives = selectRepresentativeCapybaras(capybaras)
     
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // First row - 2 capybaras
+        // Always show in 3+2 format for consistency
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            representatives.take(2).forEach { capybara ->
+            representatives.take(3).forEach { capybara ->
                 BigCapybaraItem(
                     capybara = capybara,
                     isSelected = selectedCapybara == capybara.id,
@@ -816,29 +809,17 @@ fun OrganicCapybaraLayout(
         
         Spacer(modifier = Modifier.height(24.dp))
         
-        // Second row - 3 capybaras
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            representatives.drop(2).take(3).forEach { capybara ->
+            representatives.drop(3).forEach { capybara ->
                 BigCapybaraItem(
                     capybara = capybara,
                     isSelected = selectedCapybara == capybara.id,
                     onClick = { onCapybaraClick(capybara.id) }
                 )
             }
-        }
-        
-        Spacer(modifier = Modifier.height(24.dp))
-        
-        // Third row - 1 capybara (centered)
-        representatives.drop(5).firstOrNull()?.let { capybara ->
-            BigCapybaraItem(
-                capybara = capybara,
-                isSelected = selectedCapybara == capybara.id,
-                onClick = { onCapybaraClick(capybara.id) }
-            )
         }
     }
 }
@@ -855,7 +836,7 @@ fun BigCapybaraItem(
     )
     
     val alpha by animateFloatAsState(
-        targetValue = if (capybara.isAlive) 1f else 0.5f,
+        targetValue = if (capybara.isAlive) 1f else 0.8f,
         animationSpec = tween(durationMillis = 300)
     )
     
@@ -876,41 +857,52 @@ fun BigCapybaraItem(
                     .clip(CircleShape)
             )
         } else {
+            // Show sleep emoji for resting capybaras
             Text(
                 text = "💤",
-                fontSize = 48.sp,
-                modifier = Modifier.alpha(0.7f)
+                fontSize = 56.sp
             )
         }
     }
 }
 
-// Helper function to select diverse capybaras
-fun selectDiverseCapybaras(capybaras: List<Capybara>, count: Int): List<Capybara> {
+// Helper function to select representative capybaras based on percentage
+fun selectRepresentativeCapybaras(capybaras: List<Capybara>): List<Capybara> {
+    val aliveCount = capybaras.count { it.isAlive }
+    val deadCount = capybaras.count { !it.isAlive }
+    val alivePercentage = (aliveCount / 30f) * 100f
+    
+    // Always show 5 capybaras total, but mix alive and resting based on actual ratios
+    val totalToShow = 5
+    val aliveToShow = ((aliveCount / 30f) * totalToShow).toInt().coerceAtLeast(if (aliveCount > 0) 1 else 0)
+    val restingToShow = totalToShow - aliveToShow
+    
     val aliveCapybaras = capybaras.filter { it.isAlive }
     val deadCapybaras = capybaras.filter { !it.isAlive }
     
-    // Group by mood
-    val moodGroups = aliveCapybaras.groupBy { it.mood }
     val selected = mutableListOf<Capybara>()
     
-    // Take one from each mood group first
-    moodGroups.values.forEach { group ->
-        if (selected.size < count) {
-            selected.add(group.first())
+    // Add alive capybaras with diverse moods
+    if (aliveCapybaras.isNotEmpty() && aliveToShow > 0) {
+        val moodGroups = aliveCapybaras.groupBy { it.mood }
+        moodGroups.values.forEach { group ->
+            if (selected.size < aliveToShow) {
+                selected.add(group.first())
+            }
         }
+        
+        // Fill remaining alive slots
+        val remaining = aliveCapybaras.filter { it !in selected }
+        val aliveNeeded = aliveToShow - selected.size
+        selected.addAll(remaining.take(aliveNeeded))
     }
     
-    // Fill remaining slots with alive capybaras
-    val remaining = aliveCapybaras.filter { it !in selected }
-    selected.addAll(remaining.take(count - selected.size))
-    
-    // Add dead capybaras if we still need more
-    if (selected.size < count) {
-        selected.addAll(deadCapybaras.take(count - selected.size))
+    // Add resting capybaras
+    if (deadCapybaras.isNotEmpty() && restingToShow > 0) {
+        selected.addAll(deadCapybaras.take(restingToShow))
     }
     
-    return selected.take(count)
+    return selected.take(totalToShow)
 }
 
 @Composable
@@ -931,12 +923,12 @@ fun InteractiveCapybaraGrid(
     ) {
         Column(
             modifier = Modifier.padding(24.dp)
-        ) {
-            Row(
+    ) {
+        Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-                ) {
+            verticalAlignment = Alignment.CenterVertically
+        ) {
                     Text(
                     text = "Your Capybara Friends",
                     fontFamily = FontFamily.Serif,
@@ -945,8 +937,9 @@ fun InteractiveCapybaraGrid(
                     color = MaterialTheme.colorScheme.onSurface
                     )
                 
+                    val aliveCount = capybaras.count { it.isAlive }
                     Text(
-                    text = "${capybaras.count { it.isAlive }}/30",
+                    text = "${aliveCount}/30",
                     fontFamily = FontFamily.SansSerif,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
@@ -1013,17 +1006,17 @@ fun InteractiveCapybaraItem(
                     shape = CircleShape
                 )
             ) {
-                Image(
+                    Image(
                     painter = painterResource(id = getCapybaraDrawable(capybara.mood)),
                     contentDescription = "Capybara ${capybara.id} - ${capybara.mood.name.lowercase()}",
-                    modifier = Modifier
+                        modifier = Modifier
                         .size(75.dp)
                         .padding(8.dp)
-                        .clip(CircleShape)
-                )
+                            .clip(CircleShape)
+                    )
             }
-        } else {
-            Text(
+                } else {
+                    Text(
                 text = "💤",
                 fontSize = 40.sp,
                 modifier = Modifier.alpha(0.7f)
@@ -1054,7 +1047,7 @@ fun BeautifulWellnessInsights(
             Text(
                 text = "🌱 Wellness Insights",
                 fontFamily = FontFamily.Serif,
-                style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -1142,7 +1135,7 @@ fun EnhancedPermissionCard(onRequestPermission: () -> Unit) {
             modifier = Modifier.padding(40.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
+                Text(
                 text = "🌸",
                 fontSize = 80.sp
             )
