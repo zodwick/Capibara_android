@@ -3,6 +3,7 @@ Credits:
 
 TODO:
 - notifications
+- sounds ( ambient, distress etc )
 - better visual consistency and vibe
 - app timers
 
