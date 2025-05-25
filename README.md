@@ -1,6 +1,10 @@
 Credits:
 - https://www.freepik.com/author/upklyak for the amazing capybara svgs which was the inspiration for all assets.
 
+TODO:
+- notifications
+- better visual consistency and vibe
+- app timers
 
 # Digital Wellbeing App
 
