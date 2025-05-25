@@ -341,10 +341,10 @@ fun SettingsScreen(navController: NavController) {
                             .size(48.dp)
                             .background(
                                 MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
-                                CircleShape
+                            CircleShape
                             )
-                    ) {
-                        Icon(
+                ) {
+                    Icon(
                             Icons.Default.ArrowBack, 
                             contentDescription = "Back",
                             tint = MaterialTheme.colorScheme.primary,
@@ -739,6 +739,158 @@ fun BeautifulStatCard(
 }
 
 @Composable
+fun SimpleMoodSummary(capybaras: List<Capybara>) {
+    val aliveCapybaras = capybaras.filter { it.isAlive }
+    val total = aliveCapybaras.size
+    
+    if (total > 0) {
+        val happyCount = aliveCapybaras.count { it.mood == CapybaraMood.HAPPY || it.mood == CapybaraMood.EXCITED }
+        val worriedCount = aliveCapybaras.count { it.mood == CapybaraMood.WORRIED || it.mood == CapybaraMood.ANGRY }
+        
+        val summaryText = when {
+            happyCount >= total * 0.7f -> "Most capybaras are happy and relaxed 😊"
+            worriedCount >= total * 0.5f -> "Many capybaras are feeling stressed 😟"
+            else -> "Capybaras have mixed feelings about your screen time 😐"
+        }
+        
+        Text(
+            text = summaryText,
+            fontFamily = FontFamily.SansSerif,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
+@Composable
+fun OrganicCapybaraLayout(
+    capybaras: List<Capybara>,
+    selectedCapybara: Int?,
+    onCapybaraClick: (Int) -> Unit
+) {
+    // Select diverse representatives
+    val representatives = selectDiverseCapybaras(capybaras, 6)
+    
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // First row - 2 capybaras
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            representatives.take(2).forEach { capybara ->
+                BigCapybaraItem(
+                    capybara = capybara,
+                    isSelected = selectedCapybara == capybara.id,
+                    onClick = { onCapybaraClick(capybara.id) }
+                )
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(24.dp))
+        
+        // Second row - 3 capybaras
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            representatives.drop(2).take(3).forEach { capybara ->
+                BigCapybaraItem(
+                    capybara = capybara,
+                    isSelected = selectedCapybara == capybara.id,
+                    onClick = { onCapybaraClick(capybara.id) }
+                )
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(24.dp))
+        
+        // Third row - 1 capybara (centered)
+        representatives.drop(5).firstOrNull()?.let { capybara ->
+            BigCapybaraItem(
+                capybara = capybara,
+                isSelected = selectedCapybara == capybara.id,
+                onClick = { onCapybaraClick(capybara.id) }
+            )
+        }
+    }
+}
+
+@Composable
+fun BigCapybaraItem(
+    capybara: Capybara,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    val scale by animateFloatAsState(
+        targetValue = if (isSelected) 1.1f else 1f,
+        animationSpec = tween(durationMillis = 200, easing = FastOutSlowInEasing)
+    )
+    
+    val alpha by animateFloatAsState(
+        targetValue = if (capybara.isAlive) 1f else 0.5f,
+        animationSpec = tween(durationMillis = 300)
+    )
+    
+    Box(
+        modifier = Modifier
+            .size(100.dp)
+            .scale(scale)
+            .alpha(alpha)
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        if (capybara.isAlive) {
+            Image(
+                painter = painterResource(id = getCapybaraDrawable(capybara.mood)),
+                contentDescription = "Capybara ${capybara.id} - ${capybara.mood.name.lowercase()}",
+                modifier = Modifier
+                    .size(90.dp)
+                    .clip(CircleShape)
+            )
+        } else {
+            Text(
+                text = "💤",
+                fontSize = 48.sp,
+                modifier = Modifier.alpha(0.7f)
+            )
+        }
+    }
+}
+
+// Helper function to select diverse capybaras
+fun selectDiverseCapybaras(capybaras: List<Capybara>, count: Int): List<Capybara> {
+    val aliveCapybaras = capybaras.filter { it.isAlive }
+    val deadCapybaras = capybaras.filter { !it.isAlive }
+    
+    // Group by mood
+    val moodGroups = aliveCapybaras.groupBy { it.mood }
+    val selected = mutableListOf<Capybara>()
+    
+    // Take one from each mood group first
+    moodGroups.values.forEach { group ->
+        if (selected.size < count) {
+            selected.add(group.first())
+        }
+    }
+    
+    // Fill remaining slots with alive capybaras
+    val remaining = aliveCapybaras.filter { it !in selected }
+    selected.addAll(remaining.take(count - selected.size))
+    
+    // Add dead capybaras if we still need more
+    if (selected.size < count) {
+        selected.addAll(deadCapybaras.take(count - selected.size))
+    }
+    
+    return selected.take(count)
+}
+
+@Composable
 fun InteractiveCapybaraGrid(
     capybaras: List<Capybara>,
     animationTime: Float,
@@ -761,16 +913,16 @@ fun InteractiveCapybaraGrid(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
+                ) {
+                    Text(
                     text = "Your Capybara Friends",
                     fontFamily = FontFamily.Serif,
-                    style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
-                )
+                    )
                 
-                Text(
+                    Text(
                     text = "${capybaras.count { it.isAlive }}/30",
                     fontFamily = FontFamily.SansSerif,
                     style = MaterialTheme.typography.titleMedium,
@@ -779,23 +931,19 @@ fun InteractiveCapybaraGrid(
                 )
             }
             
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            // Simple mood summary
+            SimpleMoodSummary(capybaras = capybaras)
+            
             Spacer(modifier = Modifier.height(24.dp))
             
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(6),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier.height(400.dp)
-            ) {
-                items(capybaras) { capybara ->
-                    InteractiveCapybaraItem(
-                        capybara = capybara,
-                        animationTime = animationTime,
-                        isSelected = selectedCapybara == capybara.id,
-                        onClick = { onCapybaraClick(capybara.id) }
-                    )
-                }
-            }
+            // Organic capybara layout
+            OrganicCapybaraLayout(
+                capybaras = capybaras,
+                selectedCapybara = selectedCapybara,
+                onCapybaraClick = onCapybaraClick
+            )
         }
     }
 }
@@ -809,41 +957,23 @@ fun InteractiveCapybaraItem(
 ) {
     val scale by animateFloatAsState(
         targetValue = when {
-            !capybara.isAlive -> 0.6f
-            isSelected -> 1.2f
+            !capybara.isAlive -> 0.8f
+            isSelected -> 1.1f
             else -> 1f
         },
-        animationSpec = tween(durationMillis = 800, easing = FastOutSlowInEasing)
+        animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing)
     )
     
     val alpha by animateFloatAsState(
-        targetValue = if (capybara.isAlive) 1f else 0.4f,
-        animationSpec = tween(durationMillis = 1000)
+        targetValue = if (capybara.isAlive) 1f else 0.5f,
+        animationSpec = tween(durationMillis = 500)
     )
-    
-    // Enhanced floating animation
-    val floatOffset = if (capybara.isAlive) {
-        sin(animationTime * 2 + capybara.animationOffset) * 4f
-    } else 0f
-    
-    val rotation = if (capybara.isAlive && capybara.mood == CapybaraMood.EXCITED) {
-        sin(animationTime * 3 + capybara.animationOffset) * 8f
-    } else 0f
-    
-    val wiggle = if (capybara.isAlive && isSelected) {
-        cos(animationTime * 8) * 2f
-    } else 0f
     
     Box(
         modifier = Modifier
-            .size(60.dp)
-            .offset(
-                y = floatOffset.dp,
-                x = wiggle.dp
-            )
+            .size(80.dp)
             .scale(scale)
             .alpha(alpha)
-            .rotate(rotation)
             .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
@@ -853,26 +983,26 @@ fun InteractiveCapybaraItem(
                 colors = CardDefaults.cardColors(
                     containerColor = if (isSelected) 
                         MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f)
-                        else MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                        else MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f)
                 ),
                 modifier = Modifier.shadow(
-                    elevation = if (isSelected) 12.dp else 4.dp,
+                    elevation = if (isSelected) 8.dp else 2.dp,
                     shape = CircleShape
                 )
             ) {
                 Image(
                     painter = painterResource(id = getCapybaraDrawable(capybara.mood)),
-                    contentDescription = "Capybara ${capybara.id}",
+                    contentDescription = "Capybara ${capybara.id} - ${capybara.mood.name.lowercase()}",
                     modifier = Modifier
-                        .size(55.dp)
-                        .padding(6.dp)
+                        .size(75.dp)
+                        .padding(8.dp)
                         .clip(CircleShape)
                 )
             }
         } else {
             Text(
                 text = "💤",
-                fontSize = 32.sp,
+                fontSize = 40.sp,
                 modifier = Modifier.alpha(0.7f)
             )
         }
@@ -996,21 +1126,21 @@ fun EnhancedPermissionCard(onRequestPermission: () -> Unit) {
             
             Spacer(modifier = Modifier.height(24.dp))
             
-            Text(
+                Text(
                 text = "Welcome to Capybara Sanctuary",
                 fontFamily = FontFamily.Serif,
                 style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Medium,
+                    fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center
-            )
+                )
             
             Spacer(modifier = Modifier.height(20.dp))
             
-            Text(
+                Text(
                 text = "To care for your 30 daily capybaras and track your digital wellness journey, we need permission to gently monitor your screen time.",
                 fontFamily = FontFamily.SansSerif,
-                style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                 fontWeight = FontWeight.Normal,
@@ -1046,7 +1176,7 @@ fun generateDailyCapybaras(): List<Capybara> {
         Capybara(
             id = id,
             isAlive = true,
-            mood = CapybaraMood.values().random(),
+            mood = CapybaraMood.HAPPY, // Start all happy
             animationOffset = Random.nextFloat() * 1000f
         )
     }
@@ -1063,19 +1193,47 @@ fun updateCapybarasBasedOnUsage(
     
     val actualKillCount = max(0, capybarasToKill.coerceAtMost(aliveCapybaras.size))
     
-    // Update moods based on usage
-    val updatedAlive = aliveCapybaras.map { capybara ->
+    // Intelligently distribute moods based on usage
+    val usageRatio = hoursUsed / targetHours
+    val totalAlive = aliveCapybaras.size
+    
+    val happyCount = when {
+        usageRatio <= 0.5f -> (totalAlive * 0.8f).toInt() // 80% happy when usage is low
+        usageRatio <= 0.8f -> (totalAlive * 0.6f).toInt() // 60% happy when usage is moderate
+        usageRatio <= 1.0f -> (totalAlive * 0.3f).toInt() // 30% happy when near limit
+        usageRatio <= 1.5f -> (totalAlive * 0.1f).toInt() // 10% happy when over limit
+        else -> 0 // No happy capybaras when severely over limit
+    }
+    
+    val worriedCount = when {
+        usageRatio <= 0.5f -> (totalAlive * 0.1f).toInt()
+        usageRatio <= 0.8f -> (totalAlive * 0.2f).toInt()
+        usageRatio <= 1.0f -> (totalAlive * 0.4f).toInt()
+        usageRatio <= 1.5f -> (totalAlive * 0.5f).toInt()
+        else -> (totalAlive * 0.3f).toInt()
+    }
+    
+    val angryCount = when {
+        usageRatio <= 0.8f -> 0
+        usageRatio <= 1.0f -> (totalAlive * 0.1f).toInt()
+        usageRatio <= 1.5f -> (totalAlive * 0.3f).toInt()
+        else -> (totalAlive * 0.6f).toInt()
+    }
+    
+    val contentCount = totalAlive - happyCount - worriedCount - angryCount
+    
+    // Assign moods to capybaras
+    val updatedAlive = aliveCapybaras.mapIndexed { index, capybara ->
         val newMood = when {
-            hoursUsed < targetHours * 0.5f -> CapybaraMood.EXCITED
-            hoursUsed < targetHours * 0.8f -> CapybaraMood.HAPPY
-            hoursUsed < targetHours -> CapybaraMood.CONTENT
-            hoursUsed < targetHours * 1.2f -> CapybaraMood.WORRIED
+            index < happyCount -> if (usageRatio <= 0.3f) CapybaraMood.EXCITED else CapybaraMood.HAPPY
+            index < happyCount + contentCount -> if (usageRatio <= 0.6f) CapybaraMood.PEACEFUL else CapybaraMood.CONTENT
+            index < happyCount + contentCount + worriedCount -> CapybaraMood.WORRIED
             else -> CapybaraMood.ANGRY
         }
         capybara.copy(mood = newMood)
     }
     
-    val newlyDead = updatedAlive.take(actualKillCount).map { it.copy(isAlive = false) }
+    val newlyDead = updatedAlive.take(actualKillCount).map { it.copy(isAlive = false, mood = CapybaraMood.SLEEPY) }
     val stillAlive = updatedAlive.drop(actualKillCount)
     
     return stillAlive + newlyDead + deadCapybaras
