@@ -1,3 +1,12 @@
+Credits:
+- https://www.freepik.com/author/upklyak for the amazing capybara svgs which was the inspiration for all assets.
+
+TODO:
+- notifications
+- sounds ( ambient, distress etc )
+- better visual consistency and vibe
+- app timers
+
 # Digital Wellbeing App
 
 A simple Android app that tracks and displays your daily screen time using Android's UsageStatsManager API.
