@@ -215,7 +215,7 @@ fun CapybaraSanctuaryScreen(navController: NavController) {
                         Spacer(modifier = Modifier.width(8.dp))
                         
                         Text(
-                            "Sanctuary",
+                            ";;Sanctuary",
                             fontFamily = FontFamily.Serif,
                             fontWeight = FontWeight.Medium,
                             fontSize = 22.sp,
