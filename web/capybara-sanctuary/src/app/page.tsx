@@ -56,8 +56,7 @@ export default function Home() {
                   <span className="block text-orange-700">digital world</span>
                 </h1>
                 <p className="text-lg md:text-xl text-amber-800 leading-relaxed">
-                  A gentle companion for mindful screen time. Watch over your capybara sanctuary 
-                  and discover the joy of digital balance.
+                  A gentle companion for mindful screen time. Take care of your capybaras by not using your phone too much.
                 </p>
               </div>
               
@@ -101,10 +100,10 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-6 md:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-serif text-amber-900 mb-4">
-              Does this sound familiar?
+              🧠 Reclaim Your Time. Regain Your Focus.
             </h2>
             <p className="text-lg text-amber-700 max-w-2xl mx-auto">
-              You&apos;re not alone in struggling with these modern digital challenges
+              A smarter digital wellbeing app that actually works—even when your self-control doesn't
             </p>
           </div>
           
@@ -119,11 +118,11 @@ export default function Home() {
                   className="w-full h-full object-contain capybara-image"
                 />
               </div>
-              <h3 className="text-xl font-serif text-amber-900">Endless Scrolling</h3>
-              <p className="text-amber-700">
-                &quot;I&apos;ll just check for 5 minutes...&quot; turns into hours lost in the infinite feed, 
-                leaving you feeling drained and disconnected.
-              </p>
+              <h3 className="text-xl font-serif text-amber-900">You Check Your Phone 150+ Times Daily</h3>
+              {/* <p className="text-amber-700">
+                Every buzz, ping, and notification pulls you away from what matters. Your attention 
+                is scattered across dozens of apps, leaving you feeling mentally exhausted.
+              </p> */}
             </div>
             
             <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 text-center space-y-4 shadow-lg">
@@ -136,11 +135,11 @@ export default function Home() {
                   className="w-full h-full object-contain capybara-image"
                 />
               </div>
-              <h3 className="text-xl font-serif text-amber-900">Doomscrolling Spiral</h3>
-              <p className="text-amber-700">
-                Negative news and content pulls you into a cycle of anxiety and overwhelm, 
-                making it hard to find peace in your day.
-              </p>
+              <h3 className="text-xl font-serif text-amber-900">You Lose 2.5 Hours Daily to Mindless Scrolling</h3>
+              {/* <p className="text-amber-700">
+                "Just a quick check" becomes an hour-long rabbit hole. You know you're wasting time, 
+                but somehow you can't stop reaching for your phone.
+              </p> */}
             </div>
             
             <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 text-center space-y-4 shadow-lg">
@@ -153,11 +152,11 @@ export default function Home() {
                   className="w-full h-full object-contain capybara-image"
                 />
               </div>
-              <h3 className="text-xl font-serif text-amber-900">Phone Before Sleep</h3>
-              <p className="text-amber-700">
-                Late-night scrolling disrupts your sleep, leaving you tired and less present 
-                for the people and moments that matter most.
-              </p>
+              <h3 className="text-xl font-serif text-amber-900">Your Sleep is Hijacked by Blue Light</h3>
+              {/* <p className="text-amber-700">
+                Late-night scrolling destroys your sleep quality. You're tired, irritable, and less 
+                productive the next day—creating a vicious cycle of phone dependency.
+              </p> */}
             </div>
             
             <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 text-center space-y-4 shadow-lg">
@@ -170,11 +169,11 @@ export default function Home() {
                   className="w-full h-full object-contain capybara-image"
                 />
               </div>
-              <h3 className="text-xl font-serif text-amber-900">FOMO & Comparison</h3>
-              <p className="text-amber-700">
-                Constant updates make you feel like you&apos;re missing out or not doing enough, 
-                stealing joy from your own unique journey.
-              </p>
+              <h3 className="text-xl font-serif text-amber-900">You Feel Anxious Without Your Phone</h3>
+              {/* <p className="text-amber-700">
+                Phantom vibrations, constant FOMO, and the urge to check your phone every few minutes. 
+                Your device has become a digital security blanket you can't put down.
+              </p> */}
             </div>
             
             <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 text-center space-y-4 shadow-lg">
@@ -187,11 +186,11 @@ export default function Home() {
                   className="w-full h-full object-contain capybara-image"
                 />
               </div>
-              <h3 className="text-xl font-serif text-amber-900">Constant Distraction</h3>
-              <p className="text-amber-700">
-                Every notification pulls you away from meaningful work, conversations, 
-                and experiences, fragmenting your attention.
-              </p>
+              <h3 className="text-xl font-serif text-amber-900">Your Relationships Are Suffering</h3>
+              {/* <p className="text-amber-700">
+                You're physically present but mentally absent. Family dinners, conversations with friends, 
+                and quality time are interrupted by the constant pull of your screen.
+              </p> */}
             </div>
             
             <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 text-center space-y-4 shadow-lg">
@@ -204,11 +203,11 @@ export default function Home() {
                   className="w-full h-full object-contain capybara-image"
                 />
               </div>
-              <h3 className="text-xl font-serif text-amber-900">Digital Overwhelm</h3>
-              <p className="text-amber-700">
-                Too many apps, notifications, and digital demands leave you feeling 
-                scattered and longing for simplicity and calm.
-              </p>
+              <h3 className="text-xl font-serif text-amber-900">You've Tried Everything But Nothing Sticks</h3>
+              {/* <p className="text-amber-700">
+                App timers, digital detoxes, willpower—you've tried it all. But within days (or hours), 
+                you're back to your old habits, feeling defeated and out of control.
+              </p> */}
             </div>
           </div>
           
