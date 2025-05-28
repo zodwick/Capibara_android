@@ -21,7 +21,7 @@ export default function NotFound() {
         
         <p className="text-lg text-amber-800 mb-8 leading-relaxed">
           Even the most peaceful creatures sometimes wander off the path. 
-          Let's help this little one find their way back to the sanctuary.
+          Let&apos;s help this little one find their way back to the sanctuary.
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center">

@@ -8,17 +8,17 @@ export default function Home() {
       <section className="relative overflow-hidden">
         {/* Background Image */}
         <div className="absolute inset-0 opacity-20">
-          <Image
+        <Image
             src="/images/sunset_wide_1536_1024_ghibly.png"
             alt="Peaceful sunset background"
             fill
             className="object-cover"
-            priority
-          />
+          priority
+        />
         </div>
         
         {/* Navigation */}
-        <nav className="relative z-10 flex items-center justify-between p-6 md:p-8">
+        <nav className="relative z-10 flex items-center justify-between p-4 md:p-6">
           <div className="flex items-center space-x-3">
             <Image
               src="/images/capybara_cartoon_style_sitting_happy_drinking_boba_tea_with_hearts_facing_forward_solo.png"
@@ -47,8 +47,8 @@ export default function Home() {
         </nav>
 
         {/* Hero Content */}
-        <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-8 py-20 md:py-32">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
+        <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-8 py-4 md:py-8">
+          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
             <div className="space-y-8">
               <div className="space-y-4">
                 <h1 className="text-4xl md:text-6xl font-serif text-amber-900 leading-tight">
@@ -92,6 +92,130 @@ export default function Home() {
                 <div className="w-2 h-2 bg-orange-300 rounded-full opacity-40"></div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Problems Section */}
+      <section className="py-20 md:py-32 bg-gradient-to-r from-rose-50 to-orange-50">
+        <div className="max-w-6xl mx-auto px-6 md:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-serif text-amber-900 mb-4">
+              Does this sound familiar?
+            </h2>
+            <p className="text-lg text-amber-700 max-w-2xl mx-auto">
+              You&apos;re not alone in struggling with these modern digital challenges
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 text-center space-y-4 shadow-lg">
+              <div className="w-16 h-16 mx-auto mb-4">
+                <Image
+                  src="/images/capybara_sitting_upright_alert_but_calm_looking_slightly_concerned_but_hopeful_white_bg.png"
+                  alt="Concerned capybara"
+                  width={64}
+                  height={64}
+                  className="w-full h-full object-contain capybara-image"
+                />
+              </div>
+              <h3 className="text-xl font-serif text-amber-900">Endless Scrolling</h3>
+              <p className="text-amber-700">
+                &quot;I&apos;ll just check for 5 minutes...&quot; turns into hours lost in the infinite feed, 
+                leaving you feeling drained and disconnected.
+              </p>
+            </div>
+            
+            <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 text-center space-y-4 shadow-lg">
+              <div className="w-16 h-16 mx-auto mb-4">
+                <Image
+                  src="/images/capybara_cartoon_style_sitting_content_happy__eating_lettuce_with_heart_facing_left_solo.png"
+                  alt="Stressed capybara"
+                  width={64}
+                  height={64}
+                  className="w-full h-full object-contain capybara-image"
+                />
+              </div>
+              <h3 className="text-xl font-serif text-amber-900">Doomscrolling Spiral</h3>
+              <p className="text-amber-700">
+                Negative news and content pulls you into a cycle of anxiety and overwhelm, 
+                making it hard to find peace in your day.
+              </p>
+            </div>
+            
+            <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 text-center space-y-4 shadow-lg">
+              <div className="w-16 h-16 mx-auto mb-4">
+                <Image
+                  src="/images/capybara_cartoon_style_sleeping_curled_up_with_zzz_facing_right_solo.png"
+                  alt="Tired capybara"
+                  width={64}
+                  height={64}
+                  className="w-full h-full object-contain capybara-image"
+                />
+              </div>
+              <h3 className="text-xl font-serif text-amber-900">Phone Before Sleep</h3>
+              <p className="text-amber-700">
+                Late-night scrolling disrupts your sleep, leaving you tired and less present 
+                for the people and moments that matter most.
+              </p>
+            </div>
+            
+            <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 text-center space-y-4 shadow-lg">
+              <div className="w-16 h-16 mx-auto mb-4">
+                <Image
+                  src="/images/capybara_cartoon_style_relaxed_in_hot_spring_duck_on_head_steam_bubbles_facing_left_solo.png"
+                  alt="Anxious capybara"
+                  width={64}
+                  height={64}
+                  className="w-full h-full object-contain capybara-image"
+                />
+              </div>
+              <h3 className="text-xl font-serif text-amber-900">FOMO & Comparison</h3>
+              <p className="text-amber-700">
+                Constant updates make you feel like you&apos;re missing out or not doing enough, 
+                stealing joy from your own unique journey.
+              </p>
+            </div>
+            
+            <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 text-center space-y-4 shadow-lg">
+              <div className="w-16 h-16 mx-auto mb-4">
+                <Image
+                  src="/images/capybara_cartoon_style_sitting_happy_drinking_boba_tea_with_hearts_facing_forward_solo.png"
+                  alt="Distracted capybara"
+                  width={64}
+                  height={64}
+                  className="w-full h-full object-contain capybara-image"
+                />
+              </div>
+              <h3 className="text-xl font-serif text-amber-900">Constant Distraction</h3>
+              <p className="text-amber-700">
+                Every notification pulls you away from meaningful work, conversations, 
+                and experiences, fragmenting your attention.
+              </p>
+            </div>
+            
+            <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 text-center space-y-4 shadow-lg">
+              <div className="w-16 h-16 mx-auto mb-4">
+                <Image
+                  src="/images/capybara_sitting_peacefully_meditation_pose_eyes_closed_small_smile_floating_cherry_blossoms_around_it_white_bg.png"
+                  alt="Overwhelmed capybara"
+                  width={64}
+                  height={64}
+                  className="w-full h-full object-contain capybara-image"
+                />
+              </div>
+              <h3 className="text-xl font-serif text-amber-900">Digital Overwhelm</h3>
+              <p className="text-amber-700">
+                Too many apps, notifications, and digital demands leave you feeling 
+                scattered and longing for simplicity and calm.
+              </p>
+            </div>
+          </div>
+          
+          <div className="text-center mt-12">
+            <p className="text-lg text-amber-800 font-medium">
+              What if there was a gentler way to find balance?
+            </p>
           </div>
         </div>
       </section>
@@ -232,7 +356,7 @@ export default function Home() {
       <section className="py-20 md:py-32 bg-gradient-to-r from-orange-100 to-amber-100">
         <div className="max-w-4xl mx-auto px-6 md:px-8 text-center">
           <div className="mb-8">
-            <Image
+          <Image
               src="/images/capybara_sitting_upright_alert_but_calm_looking_slightly_concerned_but_hopeful_white_bg.png"
               alt="Thoughtful capybara"
               width={120}
@@ -275,7 +399,7 @@ export default function Home() {
       <section id="download" className="py-20 md:py-32">
         <div className="max-w-4xl mx-auto px-6 md:px-8 text-center">
           <div className="mb-8">
-            <Image
+          <Image
               src="/images/capybara_cartoon_style_sitting_happy_drinking_boba_tea_with_hearts_facing_forward_solo.png"
               alt="Happy capybara with boba tea"
               width={100}
@@ -314,7 +438,7 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-8">
             <div className="space-y-4">
               <div className="flex items-center space-x-3">
-                <Image
+          <Image
                   src="/images/capybara_cartoon_style_sitting_calm_facing_left_solo_square_1024_icon.png"
                   alt="Capybara sanctuary icon"
                   width={32}
