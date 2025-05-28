@@ -1,9 +1,54 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 
 export default function Home() {
+  const [showPopup, setShowPopup] = useState(false);
+
+  const handleDownloadClick = () => {
+    setShowPopup(true);
+  };
+
+  const closePopup = () => {
+    setShowPopup(false);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50">
+      {/* Popup Modal */}
+      {showPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl p-8 max-w-md w-full text-center space-y-6 shadow-2xl">
+            <div className="w-20 h-20 mx-auto">
+              <Image
+                src="/images/capybara_cartoon_style_sitting_content_happy__eating_lettuce_with_heart_facing_left_solo.png"
+                alt="Happy capybara"
+                width={80}
+                height={80}
+                className="w-full h-full object-contain capybara-image"
+              />
+            </div>
+            <h3 className="text-2xl font-serif text-amber-900">
+              Almost ready! 🚧
+            </h3>
+            <p className="text-amber-700 leading-relaxed">
+              Our capybara sanctuary is still being lovingly crafted. We&apos;re putting the finishing touches on this peaceful digital wellness experience.
+            </p>
+            <p className="text-amber-600 text-sm">
+              Sign up for updates to be the first to know when it&apos;s ready!
+            </p>
+            <button
+              onClick={closePopup}
+              className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-3 rounded-2xl font-medium transition-all duration-300 shadow-lg hover:shadow-xl"
+            >
+              Got it!
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         {/* Background Image */}
@@ -61,7 +106,10 @@ export default function Home() {
               </div>
               
               <div className="flex flex-col sm:flex-row gap-4">
-                <button className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-4 rounded-2xl font-medium transition-all duration-300 shadow-lg hover:shadow-xl">
+                <button 
+                  onClick={handleDownloadClick}
+                  className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-4 rounded-2xl font-medium transition-all duration-300 shadow-lg hover:shadow-xl"
+                >
                   Download for Android
                 </button>
                 <Link 
@@ -103,7 +151,7 @@ export default function Home() {
               🧠 Reclaim Your Time. Regain Your Focus.
             </h2>
             <p className="text-lg text-amber-700 max-w-2xl mx-auto">
-              A smarter digital wellbeing app that actually works—even when your self-control doesn't
+              A smarter digital wellbeing app that actually works—even when your self-control doesn&apos;t
             </p>
           </div>
           
@@ -135,7 +183,7 @@ export default function Home() {
                   className="w-full h-full object-contain capybara-image"
                 />
               </div>
-              <h3 className="text-xl font-serif text-amber-900">You Lose 2.5 Hours Daily to Mindless Scrolling</h3>
+              <h3 className="text-xl font-serif text-amber-900">You Lose 4 Hours Daily to Mindless Scrolling</h3>
               {/* <p className="text-amber-700">
                 "Just a quick check" becomes an hour-long rabbit hole. You know you're wasting time, 
                 but somehow you can't stop reaching for your phone.
@@ -203,10 +251,10 @@ export default function Home() {
                   className="w-full h-full object-contain capybara-image"
                 />
               </div>
-              <h3 className="text-xl font-serif text-amber-900">You've Tried Everything But Nothing Sticks</h3>
+              <h3 className="text-xl font-serif text-amber-900">You&apos;ve Tried Everything to Stop But Nothing Sticks</h3>
               {/* <p className="text-amber-700">
-                App timers, digital detoxes, willpower—you've tried it all. But within days (or hours), 
-                you're back to your old habits, feeling defeated and out of control.
+                App timers, digital detoxes, willpower—you&apos;ve tried it all. But within days (or hours), 
+                you&apos;re back to your old habits, feeling defeated and out of control.
               </p> */}
             </div>
           </div>
@@ -417,10 +465,16 @@ export default function Home() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-4 rounded-2xl font-medium transition-all duration-300 shadow-lg hover:shadow-xl">
+            <button 
+              onClick={handleDownloadClick}
+              className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-4 rounded-2xl font-medium transition-all duration-300 shadow-lg hover:shadow-xl"
+            >
               Download for Android
             </button>
-            <button className="border-2 border-amber-600 text-amber-700 hover:bg-amber-50 px-8 py-4 rounded-2xl font-medium transition-all duration-300">
+            <button 
+              onClick={handleDownloadClick}
+              className="border-2 border-amber-600 text-amber-700 hover:bg-amber-50 px-8 py-4 rounded-2xl font-medium transition-all duration-300"
+            >
               Coming Soon: iOS
             </button>
           </div>
