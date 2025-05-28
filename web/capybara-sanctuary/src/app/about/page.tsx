@@ -55,9 +55,9 @@ export default function About() {
             <div className="space-y-6">
               <h2 className="text-3xl font-serif text-amber-900">The Capybara Way</h2>
               <p className="text-amber-800 leading-relaxed">
-                Capybaras are known for their calm, peaceful nature. They don't rush, 
-                they don't stress, and they live in harmony with their environment. 
-                They're social creatures who know when to engage and when to rest.
+                Capybaras are known for their calm, peaceful nature. They don&apos;t rush, 
+                they don&apos;t stress, and they live in harmony with their environment. 
+                They&apos;re social creatures who know when to engage and when to rest.
               </p>
               <p className="text-amber-800 leading-relaxed">
                 This is exactly the relationship we want you to have with technology - 
@@ -94,8 +94,8 @@ export default function About() {
                 judgment.
               </p>
               <p className="text-amber-800 leading-relaxed">
-                When your capybaras are happy, you know you're in balance. When they 
-                need care, it's a gentle reminder to check in with yourself.
+                When your capybaras are happy, you know you&apos;re in balance. When they 
+                need care, it&apos;s a gentle reminder to check in with yourself.
               </p>
             </div>
           </div>
@@ -210,7 +210,7 @@ export default function About() {
               Your data stays with you
             </h2>
             <p className="text-lg text-amber-800">
-              Privacy isn't just a feature - it's fundamental to digital wellness.
+              Privacy isn&apos;t just a feature - it&apos;s fundamental to digital wellness.
             </p>
           </div>
           
