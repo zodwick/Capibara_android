@@ -31,18 +31,18 @@ export default function Home() {
           </div>
           
           <div className="hidden md:flex items-center space-x-8">
-            <Link href="#features" className="text-amber-800 hover:text-amber-900 transition-colors">
+            {/* <Link href="#features" className="text-amber-800 hover:text-amber-900 transition-colors">
               Features
             </Link>
             <Link href="#screenshots" className="text-amber-800 hover:text-amber-900 transition-colors">
               Screenshots
-            </Link>
+            </Link> */}
             <Link href="/about" className="text-amber-800 hover:text-amber-900 transition-colors">
               About
             </Link>
-            <Link href="#download" className="text-amber-800 hover:text-amber-900 transition-colors">
+            {/* <Link href="#download" className="text-amber-800 hover:text-amber-900 transition-colors">
               Download
-            </Link>
+            </Link> */}
           </div>
         </nav>
 
@@ -81,7 +81,7 @@ export default function Home() {
                   alt="Peaceful meditating capybara"
                   width={400}
                   height={400}
-                  className="w-full max-w-md mx-auto"
+                  className="w-full max-w-md mx-auto capybara-image-hero mix-blend-screen rounded-full"
                 />
               </div>
               {/* Floating elements */}
@@ -116,7 +116,7 @@ export default function Home() {
                   alt="Happy capybara"
                   width={80}
                   height={80}
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-contain capybara-image"
                 />
               </div>
               <h3 className="text-xl font-serif text-amber-900">Mindful Tracking</h3>
@@ -132,7 +132,7 @@ export default function Home() {
                   alt="Relaxed capybara"
                   width={80}
                   height={80}
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-contain capybara-image"
                 />
               </div>
               <h3 className="text-xl font-serif text-amber-900">Peaceful Goals</h3>
@@ -148,7 +148,7 @@ export default function Home() {
                   alt="Sleeping capybara"
                   width={80}
                   height={80}
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-contain capybara-image"
                 />
               </div>
               <h3 className="text-xl font-serif text-amber-900">Emotional Connection</h3>
@@ -174,52 +174,52 @@ export default function Home() {
           
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="space-y-4">
-              <div className="relative overflow-hidden rounded-3xl shadow-lg">
+              <div className="screenshot-container">
                 <Image
                   src="/images/screenshot_home_page_harmony.jpg"
                   alt="Peaceful sanctuary view"
                   width={300}
                   height={600}
-                  className="w-full h-auto"
+                  className="w-full h-auto screenshot-image"
                 />
               </div>
-              <p className="text-center text-sm text-amber-700">When you're in harmony</p>
+              <p className="text-center text-sm text-amber-700">When you&apos;re in harmony</p>
             </div>
             
             <div className="space-y-4">
-              <div className="relative overflow-hidden rounded-3xl shadow-lg">
+              <div className="screenshot-container">
                 <Image
                   src="/images/screenshot_home_page_distress.jpg"
                   alt="Sanctuary needing care"
                   width={300}
                   height={600}
-                  className="w-full h-auto"
+                  className="w-full h-auto screenshot-image"
                 />
               </div>
               <p className="text-center text-sm text-amber-700">When balance is needed</p>
             </div>
             
             <div className="space-y-4">
-              <div className="relative overflow-hidden rounded-3xl shadow-lg">
+              <div className="screenshot-container">
                 <Image
                   src="/images/screenshot_set_goal_page.jpg"
                   alt="Setting gentle goals"
                   width={300}
                   height={600}
-                  className="w-full h-auto"
+                  className="w-full h-auto screenshot-image"
                 />
               </div>
               <p className="text-center text-sm text-amber-700">Setting your intentions</p>
             </div>
             
             <div className="space-y-4">
-              <div className="relative overflow-hidden rounded-3xl shadow-lg">
+              <div className="screenshot-container">
                 <Image
                   src="/images/screenshot_usage_page.jpg"
                   alt="Mindful insights"
                   width={300}
                   height={600}
-                  className="w-full h-auto"
+                  className="w-full h-auto screenshot-image"
                 />
               </div>
               <p className="text-center text-sm text-amber-700">Gentle insights</p>
@@ -237,7 +237,7 @@ export default function Home() {
               alt="Thoughtful capybara"
               width={120}
               height={120}
-              className="mx-auto"
+              className="mx-auto capybara-image"
             />
           </div>
           
@@ -255,7 +255,7 @@ export default function Home() {
             <div className="space-y-4">
               <h3 className="text-xl font-serif text-amber-900">No shame, only growth</h3>
               <p className="text-amber-700">
-                We don't believe in digital detox extremes. Instead, we help you build 
+                We don&apos;t believe in digital detox extremes. Instead, we help you build 
                 a healthier relationship with technology through mindful awareness.
               </p>
             </div>
@@ -264,7 +264,7 @@ export default function Home() {
               <h3 className="text-xl font-serif text-amber-900">Emotional intelligence</h3>
               <p className="text-amber-700">
                 Your capybaras respond to your digital habits with empathy, not judgment. 
-                They're here to support your journey, not make you feel guilty.
+                They&apos;re here to support your journey, not make you feel guilty.
               </p>
             </div>
           </div>
@@ -280,7 +280,7 @@ export default function Home() {
               alt="Happy capybara with boba tea"
               width={100}
               height={100}
-              className="mx-auto"
+              className="mx-auto capybara-image"
             />
           </div>
           
@@ -339,7 +339,7 @@ export default function Home() {
             <div className="space-y-4">
               <h3 className="font-serif text-lg">Philosophy</h3>
               <p className="text-amber-200">
-                "In a world of endless notifications, sometimes the most radical act is simply being present."
+                &ldquo;In a world of endless notifications, sometimes the most radical act is simply being present.&rdquo;
               </p>
             </div>
           </div>

@@ -244,3 +244,43 @@ img {
     background-position: 200% 0;
   }
 }
+
+/* Capybara image styling - blend white backgrounds */
+.capybara-image {
+  mix-blend-mode: multiply;
+  filter: drop-shadow(0 4px 12px rgba(217, 119, 6, 0.15));
+}
+
+.capybara-image-hero {
+  mix-blend-mode: screen;
+  filter: drop-shadow(0 8px 25px rgba(217, 119, 6, 0.2));
+}
+
+/* Screenshot styling - remove black borders and enhance */
+.screenshot-image {
+  /* border: 2px solid rgba(217, 119, 6, 0.1); */
+  /* box-shadow: 
+    0 10px 25px rgba(0, 0, 0, 0.1),
+    0 4px 10px rgba(217, 119, 6, 0.1); */
+  transition: all 0.3s ease;
+}
+
+.screenshot-image:hover {
+  transform: translateY(-4px);
+  /* box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.15),
+    0 8px 20px rgba(217, 119, 6, 0.15); */
+}
+
+/* Remove any black artifacts from screenshots */
+.screenshot-container {
+  background: linear-gradient(135deg, #fef7ed, #fed7aa);
+  padding: 4px;
+  border-radius: 28px;
+}
+
+.screenshot-container img {
+  border-radius: 24px;
+  border: none;
+  outline: none;
+}

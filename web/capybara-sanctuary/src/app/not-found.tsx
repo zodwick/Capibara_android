@@ -11,7 +11,7 @@ export default function NotFound() {
             alt="Confused capybara"
             width={200}
             height={200}
-            className="mx-auto"
+            className="mx-auto capybara-image-hero"
           />
         </div>
         

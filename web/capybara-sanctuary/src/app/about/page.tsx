@@ -34,7 +34,7 @@ export default function About() {
               alt="Thoughtful capybara"
               width={120}
               height={120}
-              className="mx-auto"
+              className="mx-auto capybara-image"
             />
           </div>
           
@@ -70,7 +70,7 @@ export default function About() {
                 alt="Relaxed capybara in hot spring"
                 width={300}
                 height={300}
-                className="w-full max-w-sm mx-auto"
+                className="w-full max-w-sm mx-auto capybara-image"
               />
             </div>
           </div>
@@ -83,7 +83,7 @@ export default function About() {
                 alt="Happy capybara eating"
                 width={300}
                 height={300}
-                className="w-full max-w-sm mx-auto"
+                className="w-full max-w-sm mx-auto capybara-image"
               />
             </div>
             <div className="order-1 md:order-2 space-y-6">
@@ -120,7 +120,7 @@ export default function About() {
                 alt="Meditating capybara"
                 width={300}
                 height={300}
-                className="w-full max-w-sm mx-auto"
+                className="w-full max-w-sm mx-auto capybara-image-hero"
               />
             </div>
           </div>
@@ -140,7 +140,7 @@ export default function About() {
                   alt="Happy capybara"
                   width={64}
                   height={64}
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-contain capybara-image"
                 />
               </div>
               <h3 className="text-xl font-serif text-amber-900">Daily Check-ins</h3>
@@ -157,7 +157,7 @@ export default function About() {
                   alt="Sleeping capybara"
                   width={64}
                   height={64}
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-contain capybara-image"
                 />
               </div>
               <h3 className="text-xl font-serif text-amber-900">Peaceful Goals</h3>
@@ -174,7 +174,7 @@ export default function About() {
                   alt="Alert capybara"
                   width={64}
                   height={64}
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-contain capybara-image"
                 />
               </div>
               <h3 className="text-xl font-serif text-amber-900">Mindful Insights</h3>
@@ -191,12 +191,12 @@ export default function About() {
                   alt="Relaxed capybara"
                   width={64}
                   height={64}
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-contain capybara-image"
                 />
               </div>
               <h3 className="text-xl font-serif text-amber-900">Gentle Reminders</h3>
               <p className="text-amber-700">
-                When your capybaras need care, you'll get a gentle notification. 
+                When your capybaras need care, you&apos;ll get a gentle notification. 
                 No harsh alarms or guilt trips - just a friendly check-in.
               </p>
             </div>
@@ -249,7 +249,7 @@ export default function About() {
               alt="Happy capybara with boba tea"
               width={100}
               height={100}
-              className="mx-auto"
+              className="mx-auto capybara-image"
             />
           </div>
           

@@ -10,7 +10,7 @@ export default function Loading() {
             alt="Happy capybara"
             width={120}
             height={120}
-            className="mx-auto"
+            className="mx-auto capybara-image"
           />
         </div>
         
