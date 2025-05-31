@@ -62,6 +62,8 @@ import kotlin.math.max
 import kotlin.math.sin
 import kotlin.math.cos
 import kotlin.random.Random
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
 
 data class Capybara(
     val id: Int,
@@ -91,6 +93,11 @@ class SettingsManager(private val context: Context) {
             putBoolean("notifications_enabled", settings.notificationsEnabled)
             putBoolean("sound_enabled", settings.soundEnabled)
             apply()
+        }
+        val appWidgetManager = AppWidgetManager.getInstance(context)
+        val ids = appWidgetManager.getAppWidgetIds(ComponentName(context, CapybaraWidgetProvider::class.java))
+        if (ids.isNotEmpty()) {
+            CapybaraWidgetProvider().onUpdate(context, appWidgetManager, ids)
         }
     }
     
@@ -1563,8 +1570,6 @@ fun UsageOverviewCard(screenTimeData: DailyScreenTime?) {
         }
     }
 }
-
-
 
 @Composable
 fun AppUsageBreakdownCard(screenTimeData: DailyScreenTime?) {
