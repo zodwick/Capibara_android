@@ -27,67 +27,86 @@ class CapybaraWidgetProvider : AppWidgetProvider() {
         appWidgetManager: AppWidgetManager,
         appWidgetId: Int
     ) {
-        val views = RemoteViews(context.packageName, getWidgetLayout(context, appWidgetId))
-        
-        // Get screen time data
-        val screenTimeManager = ScreenTimeManager(context)
-        val screenTimeData = screenTimeManager.getDailyScreenTime()
-        val settingsManager = SettingsManager(context)
-        val userSettings = settingsManager.loadSettings()
-        
-        // Calculate remaining time
-        val totalMinutes = (screenTimeData?.totalScreenTime ?: 0) / (1000 * 60)
-        val targetMinutes = (userSettings.dailyTargetHours * 60).toInt()
-        val remainingMinutes = max(0, targetMinutes - totalMinutes)
-        
-        // Set the time text
-        val timeText = when {
-            remainingMinutes <= 0 -> "Time's up!"
-            remainingMinutes < 60 -> "${remainingMinutes}m left"
-            else -> {
-                val hours = remainingMinutes / 60
-                val minutes = remainingMinutes % 60
-                "${hours}h ${minutes}m left"
+        try {
+            val views = RemoteViews(context.packageName, getWidgetLayout(context, appWidgetId))
+            
+            // Get screen time data
+            val screenTimeManager = ScreenTimeManager(context)
+            val screenTimeData = try {
+                screenTimeManager.getDailyScreenTime()
+            } catch (e: Exception) {
+                Log.e("CapybaraWidget", "Error getting screen time data", e)
+                null
             }
-        }
-        views.setTextViewText(R.id.widget_time_text, timeText)
-        
-        // Set the capybara image based on screen time
-        val healthPercentage = if (totalMinutes > 0) {
-            (targetMinutes - totalMinutes).toFloat() / targetMinutes
-        } else {
-            1f
-        }
-        
-        val imageResId = when {
-            healthPercentage >= 0.8f -> R.drawable.capybara_sitting_peacefully_meditation_pose_eyes_closed_small_smile_floating_cherry_blossoms_around_it_white_bg
-            healthPercentage >= 0.5f -> R.drawable.capybara_sitting_upright_alert_but_calm_looking_slightly_concerned_but_hopeful_white_bg
-            healthPercentage >= 0.2f -> R.drawable.capybara_sitting_with_drooped_ears_tired_expression_holding_a_small_wilted_flower_white_bg
-            else -> R.drawable.capybara_hungry_and_in_despair_white_bg
-        }
-        views.setImageViewResource(R.id.widget_capybara_image, imageResId)
-        
-        // Set up click intent to open the app
-        val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
-        val pendingIntent = PendingIntent.getActivity(
-            context,
-            0,
-            intent,
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            
+            val settingsManager = SettingsManager(context)
+            val userSettings = try {
+                settingsManager.loadSettings()
+            } catch (e: Exception) {
+                Log.e("CapybaraWidget", "Error loading settings", e)
+                UserSettings() // Use default settings
+            }
+            
+            // Calculate remaining time
+            val totalMinutes = (screenTimeData?.totalScreenTime ?: 0) / (1000 * 60)
+            val targetMinutes = (userSettings.dailyTargetHours * 60).toInt()
+            
+            // Calculate health percentage for capybara mood
+            val healthPercentage = if (totalMinutes > 0) {
+                (targetMinutes - totalMinutes).toFloat() / targetMinutes
             } else {
-                PendingIntent.FLAG_UPDATE_CURRENT
+                1f
             }
-        )
-        views.setOnClickPendingIntent(R.id.widget_capybara_image, pendingIntent)
-        
-        // Update the widget
-        appWidgetManager.updateAppWidget(appWidgetId, views)
+            
+            // Set capybara image based on screen time - let the image speak for itself
+            val imageResId = when {
+                healthPercentage >= 0.8f -> 
+                    R.drawable.capybara_sitting_peacefully_meditation_pose_eyes_closed_small_smile_floating_cherry_blossoms_around_it_white_bg
+                healthPercentage >= 0.5f -> 
+                    R.drawable.capybara_sitting_upright_alert_but_calm_looking_slightly_concerned_but_hopeful_white_bg
+                healthPercentage >= 0.2f -> 
+                    R.drawable.capybara_sitting_with_drooped_ears_tired_expression_holding_a_small_wilted_flower_white_bg
+                else -> 
+                    R.drawable.capybara_hungry_and_in_despair_white_bg
+            }
+            
+            try {
+                views.setImageViewResource(R.id.widget_capybara_image, imageResId)
+            } catch (e: Exception) {
+                Log.e("CapybaraWidget", "Error setting capybara image", e)
+            }
+            
+            // Set up click intent to open the app
+            try {
+                val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
+                val pendingIntent = PendingIntent.getActivity(
+                    context,
+                    0,
+                    intent,
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                    } else {
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                    }
+                )
+                
+                // Make the entire widget clickable
+                views.setOnClickPendingIntent(R.id.widget_capybara_image, pendingIntent)
+            } catch (e: Exception) {
+                Log.e("CapybaraWidget", "Error setting click intent", e)
+            }
+            
+            // Update the widget
+            appWidgetManager.updateAppWidget(appWidgetId, views)
+            Log.d("CapybaraWidget", "Minimal widget updated successfully")
+        } catch (e: Exception) {
+            Log.e("CapybaraWidget", "Error updating widget", e)
+        }
     }
 
     private fun getWidgetLayout(context: Context, appWidgetId: Int): Int {
-        // Only 2x2 widget is supported
-        return R.layout.widget_capybara_2x2
+        // Use minimal layout - just the capybara for emotional connection
+        return R.layout.widget_minimal
     }
 
     override fun onEnabled(context: Context) {

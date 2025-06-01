@@ -7,4 +7,16 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    
+    <!-- Widget-specific colors -->
+    <color name="widget_primary">#FF6B4E71</color>
+    <color name="widget_secondary">#FF9B7EAC</color>
+    <color name="widget_accent">#FFFFD6CC</color>
+    <color name="widget_text_primary">#FF2D2D2D</color>
+    <color name="widget_text_secondary">#FF5D5D5D</color>
+    <color name="widget_overlay">#80FFFFFF</color>
+    <color name="widget_shadow">#40000000</color>
+    <color name="widget_success">#FF4CAF50</color>
+    <color name="widget_warning">#FFFF9800</color>
+    <color name="widget_error">#FFF44336</color>
 </resources>
