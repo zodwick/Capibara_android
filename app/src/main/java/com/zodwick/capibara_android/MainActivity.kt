@@ -133,13 +133,18 @@ class MainActivity : ComponentActivity() {
                     composable("detailed_usage") {
                         DetailedUsageScreen(navController = navController)
                     }
+                    composable("app_timers") {
+                        AppTimersScreen(navController = navController)
+                    }
+                    composable("focus_sessions") {
+                        FocusSessionScreen(navController = navController)
+                    }
                 }
             }
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CapybaraSanctuaryScreen(navController: NavController) {
     val context = LocalContext.current
@@ -361,7 +366,6 @@ fun CapybaraSanctuaryScreen(navController: NavController) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(navController: NavController) {
     val context = LocalContext.current
@@ -497,6 +501,11 @@ fun SettingsScreen(navController: NavController) {
                         description = "Customize your gentle reminders",
                         color = MaterialTheme.colorScheme.secondary
                     ) {
+                        val context = LocalContext.current
+                        val timerManager = remember { TimerManager(context) }
+                        val breakReminder by timerManager.breakReminder.collectAsState()
+                        var breakInterval by remember { mutableStateOf(breakReminder.intervalMinutes) }
+                        
                         Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
                             SettingsToggle(
                                 title = "Gentle Reminders",
@@ -509,6 +518,41 @@ fun SettingsScreen(navController: NavController) {
                             )
                             
                             SettingsToggle(
+                                title = "Break Reminders",
+                                description = "Regular reminders to take screen breaks",
+                                checked = breakReminder.isEnabled,
+                                onCheckedChange = { enabled ->
+                                    timerManager.setBreakReminder(breakInterval, enabled)
+                                }
+                            )
+                            
+                            if (breakReminder.isEnabled) {
+                                Column {
+                                    Text(
+                                        text = "Break interval: $breakInterval minutes",
+                                        fontFamily = FontFamily.SansSerif,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.Medium,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                    
+                                    Slider(
+                                        value = breakInterval.toFloat(),
+                                        onValueChange = { 
+                                            breakInterval = it.toInt()
+                                            timerManager.setBreakReminder(breakInterval, breakReminder.isEnabled)
+                                        },
+                                        valueRange = 15f..120f,
+                                        steps = 6,
+                                        colors = SliderDefaults.colors(
+                                            thumbColor = MaterialTheme.colorScheme.secondary,
+                                            activeTrackColor = MaterialTheme.colorScheme.secondary
+                                        )
+                                    )
+                                }
+                            }
+                            
+                            SettingsToggle(
                                 title = "Sound Effects",
                                 description = "Peaceful sounds for interactions",
                                 checked = userSettings.soundEnabled,
@@ -517,6 +561,44 @@ fun SettingsScreen(navController: NavController) {
                                     settingsManager.saveSettings(userSettings)
                                 }
                             )
+                        }
+                    }
+                }
+                
+                item {
+                    BeautifulSettingsCard(
+                        title = "⏰ App Timers",
+                        description = "Set time limits for specific apps to keep your capybaras happy",
+                        color = MaterialTheme.colorScheme.primary
+                    ) {
+                        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                            Button(
+                                onClick = { navController.navigate("app_timers") },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(56.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.primary
+                                )
+                            ) {
+                                Text("⏰", fontSize = 20.sp)
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Manage App Timers", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                            }
+                            
+                            OutlinedButton(
+                                onClick = { navController.navigate("focus_sessions") },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(56.dp),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    contentColor = MaterialTheme.colorScheme.primary
+                                )
+                            ) {
+                                Text("🧠", fontSize = 20.sp)
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Focus Sessions", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                            }
                         }
                     }
                 }
@@ -1332,7 +1414,6 @@ fun getSanctuaryWellnessCapybara(healthPercentage: Float): Int {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailedUsageScreen(navController: NavController) {
     val context = LocalContext.current
@@ -1550,7 +1631,7 @@ fun UsageOverviewCard(screenTimeData: DailyScreenTime?) {
                 Spacer(modifier = Modifier.height(16.dp))
                 
                 LinearProgressIndicator(
-                    progress = { progress },
+                    progress = progress,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(8.dp),
