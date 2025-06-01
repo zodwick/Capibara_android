@@ -2,31 +2,14 @@ package com.zodwick.capibara_android.ui.theme
 
 import android.app.Activity
 import android.os.Build
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
-private val DarkColorScheme = darkColorScheme(
-    primary = MoonGlow,
-    secondary = TwilightPurple,
-    tertiary = WarmAmber,
-    background = NightSky,
-    surface = DeepForest,
-    primaryContainer = DeepForest,
-    secondaryContainer = TwilightPurple,
-    onPrimary = NightSky,
-    onSecondary = MoonGlow,
-    onBackground = MoonGlow,
-    onSurface = MoonGlow,
-    onPrimaryContainer = MoonGlow,
-    onSecondaryContainer = MoonGlow
-)
+// Removed DarkColorScheme since we're forcing light mode only
 
 private val LightColorScheme = lightColorScheme(
     primary = ForestGreen,
@@ -51,19 +34,18 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun CapibaraAndroidTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = false, // Force light mode always
     // Dynamic color disabled to show our beautiful Ghibli colors
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
+    // Always use light color scheme regardless of system settings
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            dynamicLightColorScheme(context) // Force light even for dynamic colors
         }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+        else -> LightColorScheme // Always use light scheme
     }
 
     MaterialTheme(
