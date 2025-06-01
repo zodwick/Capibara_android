@@ -2,14 +2,29 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="8dp">
+    android:background="@drawable/widget_outer_frame">
 
     <ImageView
         android:id="@+id/widget_capybara_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        android:background="@drawable/widget_minimal_frame"
         android:contentDescription="Capybara sanctuary" />
+
+    <!-- Minimal hours left indicator -->
+    <TextView
+        android:id="@+id/widget_hours_left"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="12dp"
+        android:text="3h left"
+        android:textColor="#FF2D2D2D"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:fontFamily="sans-serif-medium"
+        android:background="@drawable/widget_hours_simple"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="4dp" />
 
 </FrameLayout> 

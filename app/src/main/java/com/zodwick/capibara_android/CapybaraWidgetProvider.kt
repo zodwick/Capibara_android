@@ -50,6 +50,15 @@ class CapybaraWidgetProvider : AppWidgetProvider() {
             // Calculate remaining time
             val totalMinutes = (screenTimeData?.totalScreenTime ?: 0) / (1000 * 60)
             val targetMinutes = (userSettings.dailyTargetHours * 60).toInt()
+            val remainingMinutes = max(0, targetMinutes - totalMinutes)
+            
+            // Display hours left in beautiful format
+            val hoursText = when {
+                remainingMinutes <= 0 -> "Time's up!"
+                remainingMinutes < 60 -> "1h left"
+                else -> "${remainingMinutes / 60}h left"
+            }
+            views.setTextViewText(R.id.widget_hours_left, hoursText)
             
             // Calculate health percentage for capybara mood
             val healthPercentage = if (totalMinutes > 0) {
