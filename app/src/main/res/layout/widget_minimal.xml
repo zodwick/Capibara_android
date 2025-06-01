@@ -23,7 +23,7 @@
         android:textColor="#FF2D2D2D"
         android:textSize="13sp"
         android:textStyle="bold"
-        android:fontFamily="sans-serif-medium"
+        android:fontFamily="serif"
         android:background="@drawable/widget_hours_full_width"
         android:paddingHorizontal="8dp"
         android:paddingVertical="4dp"
