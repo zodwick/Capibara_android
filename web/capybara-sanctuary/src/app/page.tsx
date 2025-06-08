@@ -7,7 +7,6 @@ import { useState } from "react";
 export default function Home() {
   const [showPopup, setShowPopup] = useState(false);
 
-
   const closePopup = () => {
     setShowPopup(false);
   };
@@ -548,8 +547,6 @@ export default function Home() {
               </p>
             </div>
           </section>
-
-    
         </div>
       </section>
 
@@ -578,7 +575,10 @@ export default function Home() {
               <h3 className="font-serif text-lg">Connect</h3>
               <div className="space-y-2">
                 <p className="text-amber-200">
-                  Github: <Link href="https://github.com/zodwick/Capibara_android">zodwick/Capibara_android</Link>
+                  Github:{" "}
+                  <Link href="https://github.com/zodwick/Capibara_android">
+                    zodwick/Capibara_android
+                  </Link>
                 </p>
                 <p className="text-amber-200">
                   Made with 🤍 for mindful living
