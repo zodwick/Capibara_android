@@ -33,7 +33,7 @@ private val LightColorScheme = lightColorScheme(
 )
 
 @Composable
-fun CapibaraAndroidTheme(
+fun SanctuaryTheme(
     darkTheme: Boolean = false, // Force light mode always
     // Dynamic color disabled to show our beautiful Ghibli colors
     dynamicColor: Boolean = false,

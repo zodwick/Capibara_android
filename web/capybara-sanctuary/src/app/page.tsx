@@ -7,7 +7,6 @@ import { useState } from "react";
 export default function Home() {
   const [showPopup, setShowPopup] = useState(false);
 
-
   const closePopup = () => {
     setShowPopup(false);
   };
@@ -72,7 +71,7 @@ export default function Home() {
               className="rounded-full"
             />
             <span className="text-xl font-serif text-amber-900">
-              ;;Sanctuary
+              Sanctuary
             </span>
           </div>
 
@@ -110,7 +109,7 @@ export default function Home() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="https://github.com/zodwick/Capibara_android">
+                <Link href="https://github.com/zodwick/Capibara_android/releases/tag/v1.0.0">
                   <button
                     // onClick={handleDownloadClick}
                     className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-4 rounded-2xl cursor-pointer font-medium transition-all duration-300 shadow-lg hover:shadow-xl"
@@ -548,8 +547,6 @@ export default function Home() {
               </p>
             </div>
           </section>
-
-    
         </div>
       </section>
 
@@ -566,7 +563,7 @@ export default function Home() {
                   height={32}
                   className="rounded-lg"
                 />
-                <span className="text-lg font-serif">;;Sanctuary</span>
+                <span className="text-lg font-serif">Sanctuary</span>
               </div>
               <p className="text-amber-200">
                 A gentle approach to digital wellness, inspired by the peaceful
@@ -578,7 +575,10 @@ export default function Home() {
               <h3 className="font-serif text-lg">Connect</h3>
               <div className="space-y-2">
                 <p className="text-amber-200">
-                  Github: <Link href="https://github.com/zodwick/Capibara_android">zodwick/Capibara_android</Link>
+                  Github:{" "}
+                  <Link href="https://github.com/zodwick/Capibara_android">
+                    zodwick/Capibara_android
+                  </Link>
                 </p>
                 <p className="text-amber-200">
                   Made with 🤍 for mindful living
