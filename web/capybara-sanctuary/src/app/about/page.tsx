@@ -116,11 +116,11 @@ export default function About() {
             </div>
             <div className="relative">
               <Image
-                src="/images/capybara_sitting_peacefully_meditation_pose_eyes_closed_small_smile_floating_cherry_blossoms_around_it_white_bg.png"
+                src="/images/capibara_chilling_headphone_laptop.png"
                 alt="Meditating capybara"
                 width={300}
                 height={300}
-                className="w-full max-w-sm mx-auto capybara-image-hero"
+                className="w-full max-w-sm mx-auto"
               />
             </div>
           </div>
