@@ -5,7 +5,7 @@ TODO:
 - notifications
 - sounds ( ambient, distress etc )
 - better visual consistency and vibe
-- app timers
+- app timers (barely working rn)
 
 # Note from the developer
 
