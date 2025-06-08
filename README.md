@@ -1,6 +1,10 @@
 Credits:
 - https://www.freepik.com/author/upklyak for the amazing capybara svgs which was the inspiration for all assets.
 
+# How to install
+- download the apk from the releases
+- install it, if blocked by play protect - pls pause it and then install. You can turn it back on after installing. (no way to get it pass unless on the play store)
+  
 TODO:
 - notifications
 - sounds ( ambient, distress etc )
