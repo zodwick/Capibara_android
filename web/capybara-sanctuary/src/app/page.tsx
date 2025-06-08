@@ -101,8 +101,7 @@ export default function Home() {
                   <span className="block text-orange-700">digital world</span>
                 </h1>
                 <p className="text-lg md:text-xl text-amber-800 leading-relaxed">
-                  A gentle companion for mindful screen time. Take care of your capybaras by not using your phone too much.
-                </p>
+Guilt triiping you into using your phone less.                </p>
               </div>
               
               <div className="flex flex-col sm:flex-row gap-4">
@@ -331,8 +330,32 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Widget Section */}
+      <section className="py-20 md:py-32 bg-white/50 backdrop-blur-sm">
+        <div className="max-w-6xl mx-auto px-6 md:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-serif text-amber-900 mb-4">
+              Home Screen Widget
+            </h2>
+            <p className="text-lg text-amber-700">
+              Your sanctuary, always visible
+            </p>
+          </div>
+          
+          <div className="max-w-md mx-auto">
+            <Image
+              src="/images/Screenshot_widget_cropped.png"
+              alt="Capybara Sanctuary home screen widget"
+              width={400}
+              height={400}
+              className="w-full h-auto rounded-xl shadow-lg"
+            />
+          </div>
+        </div>
+      </section>
+
       {/* Screenshots Section */}
-      <section id="screenshots" className="py-20 md:py-32">
+      <section id="screenshots" className="py-20 md:py-32 bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50">
         <div className="max-w-6xl mx-auto px-6 md:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-serif text-amber-900 mb-4">
@@ -343,57 +366,69 @@ export default function Home() {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="space-y-4">
-              <div className="screenshot-container">
-                <Image
-                  src="/images/screenshot_home_page_harmony.jpg"
-                  alt="Peaceful sanctuary view"
-                  width={300}
-                  height={600}
-                  className="w-full h-auto screenshot-image"
-                />
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="group">
+              <div className="relative bg-gradient-to-br from-white to-gray-50 rounded-3xl p-4 shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105">
+                <div className="absolute inset-0 bg-gradient-to-br from-amber-100/20 to-orange-100/20 rounded-3xl"></div>
+                <div className="relative">
+                  <Image
+                    src="/images/screenshot_home_page_harmony.jpg"
+                    alt="Peaceful sanctuary view"
+                    width={300}
+                    height={600}
+                    className="w-full h-auto rounded-2xl shadow-lg"
+                  />
+                </div>
               </div>
-              <p className="text-center text-sm text-amber-700">When you&apos;re in harmony</p>
+              <p className="text-center text-amber-700 font-medium mt-6">When you&apos;re in harmony</p>
             </div>
             
-            <div className="space-y-4">
-              <div className="screenshot-container">
-                <Image
-                  src="/images/screenshot_home_page_distress.jpg"
-                  alt="Sanctuary needing care"
-                  width={300}
-                  height={600}
-                  className="w-full h-auto screenshot-image"
-                />
+            <div className="group">
+              <div className="relative bg-gradient-to-br from-white to-gray-50 rounded-3xl p-4 shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105">
+                <div className="absolute inset-0 bg-gradient-to-br from-rose-100/20 to-pink-100/20 rounded-3xl"></div>
+                <div className="relative">
+                  <Image
+                    src="/images/screenshot_home_page_distress.jpg"
+                    alt="Sanctuary needing care"
+                    width={300}
+                    height={600}
+                    className="w-full h-auto rounded-2xl shadow-lg"
+                  />
+                </div>
               </div>
-              <p className="text-center text-sm text-amber-700">When balance is needed</p>
+              <p className="text-center text-amber-700 font-medium mt-6">When balance is needed</p>
             </div>
             
-            <div className="space-y-4">
-              <div className="screenshot-container">
-                <Image
-                  src="/images/screenshot_set_goal_page.jpg"
-                  alt="Setting gentle goals"
-                  width={300}
-                  height={600}
-                  className="w-full h-auto screenshot-image"
-                />
+            <div className="group">
+              <div className="relative bg-gradient-to-br from-white to-gray-50 rounded-3xl p-4 shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105">
+                <div className="absolute inset-0 bg-gradient-to-br from-green-100/20 to-emerald-100/20 rounded-3xl"></div>
+                <div className="relative">
+                  <Image
+                    src="/images/screenshot_set_goal_page.jpg"
+                    alt="Setting gentle goals"
+                    width={300}
+                    height={600}
+                    className="w-full h-auto rounded-2xl shadow-lg"
+                  />
+                </div>
               </div>
-              <p className="text-center text-sm text-amber-700">Setting your intentions</p>
+              <p className="text-center text-amber-700 font-medium mt-6">Setting your intentions</p>
             </div>
             
-            <div className="space-y-4">
-              <div className="screenshot-container">
-                <Image
-                  src="/images/screenshot_usage_page.jpg"
-                  alt="Mindful insights"
-                  width={300}
-                  height={600}
-                  className="w-full h-auto screenshot-image"
-                />
+            <div className="group">
+              <div className="relative bg-gradient-to-br from-white to-gray-50 rounded-3xl p-4 shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-100/20 to-indigo-100/20 rounded-3xl"></div>
+                <div className="relative">
+                  <Image
+                    src="/images/screenshot_usage_page.jpg"
+                    alt="Mindful insights"
+                    width={300}
+                    height={600}
+                    className="w-full h-auto rounded-2xl shadow-lg"
+                  />
+                </div>
               </div>
-              <p className="text-center text-sm text-amber-700">Gentle insights</p>
+              <p className="text-center text-amber-700 font-medium mt-6">Gentle insights</p>
             </div>
           </div>
         </div>
