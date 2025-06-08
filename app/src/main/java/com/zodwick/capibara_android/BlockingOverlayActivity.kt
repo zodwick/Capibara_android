@@ -28,7 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.zodwick.capibara_android.ui.theme.CapibaraAndroidTheme
+import com.zodwick.capibara_android.ui.theme.SanctuaryTheme
 import kotlinx.coroutines.delay
 
 class BlockingOverlayActivity : ComponentActivity() {
@@ -42,7 +42,7 @@ class BlockingOverlayActivity : ComponentActivity() {
         val currentUsage = intent.getIntExtra("current_usage", 0)
         
         setContent {
-            CapibaraAndroidTheme {
+            SanctuaryTheme {
                 AppBlockedScreen(
                     appName = blockedAppName,
                     packageName = blockedPackageName,

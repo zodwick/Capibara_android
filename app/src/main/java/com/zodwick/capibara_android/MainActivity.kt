@@ -57,7 +57,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.zodwick.capibara_android.ui.theme.CapibaraAndroidTheme
+import com.zodwick.capibara_android.ui.theme.SanctuaryTheme
 import java.util.*
 import kotlin.math.max
 import kotlin.math.sin
@@ -117,7 +117,7 @@ class MainActivity : ComponentActivity() {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         enableEdgeToEdge()
         setContent {
-            CapibaraAndroidTheme {
+            SanctuaryTheme {
                 val navController = rememberNavController()
                 
                 NavHost(
@@ -1762,7 +1762,7 @@ fun AppUsageItem(
 @Preview(showBackground = true)
 @Composable
 fun CapybaraSanctuaryPreview() {
-    CapibaraAndroidTheme {
+    SanctuaryTheme {
         val navController = rememberNavController()
         CapybaraSanctuaryScreen(navController = navController)
     }
