@@ -22,4 +22,36 @@ object PermissionHelper {
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         context.startActivity(intent)
     }
+    
+    fun hasAccessibilityPermission(context: Context): Boolean {
+        return context.isAccessibilityServiceEnabled()
+    }
+    
+    fun requestAccessibilityPermission(context: Context) {
+        val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        context.startActivity(intent)
+    }
+    
+    fun hasSystemAlertWindowPermission(context: Context): Boolean {
+        return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            Settings.canDrawOverlays(context)
+        } else {
+            true // Permission not required on older versions
+        }
+    }
+    
+    fun requestSystemAlertWindowPermission(context: Context) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            context.startActivity(intent)
+        }
+    }
+    
+    fun hasAllBlockingPermissions(context: Context): Boolean {
+        return hasUsageStatsPermission(context) && 
+               hasAccessibilityPermission(context) && 
+               hasSystemAlertWindowPermission(context)
+    }
 } 

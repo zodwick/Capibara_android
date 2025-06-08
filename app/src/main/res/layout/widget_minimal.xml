@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_outer_frame">
+
+    <ImageView
+        android:id="@+id/widget_capybara_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="20dp"
+        android:scaleType="centerCrop"
+        android:contentDescription="Capybara sanctuary" />
+
+    <!-- Full width banner text at top -->
+    <TextView
+        android:id="@+id/widget_hours_left"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:layout_marginTop="6dp"
+        android:text="3h left"
+        android:textColor="#FF2D2D2D"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:fontFamily="serif"
+        android:background="@drawable/widget_hours_full_width"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="4dp"
+        android:gravity="center" />
+
+</FrameLayout> 

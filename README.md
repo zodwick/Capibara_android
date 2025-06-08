@@ -5,7 +5,24 @@ TODO:
 - notifications
 - sounds ( ambient, distress etc )
 - better visual consistency and vibe
-- app timers
+- app timers (barely working rn)
+
+# Note from the developer
+
+Most, if not all of this app is vibe coded (mostly due to skill issues). I did not write a single line of code. So please don't judge me.
+Started building this based on a simple idea with 0 Kotlin knowledge. But everything seems to work :)
+Some considerations:
+- Entirely open source - do what you want as you wish
+- No data is collected or sent to any server. All data is stored locally on your device.
+- No ads or tracking.
+- No unnecessary permissions are required.
+
+
+If anyone with better skills wants to help, please do so. I'm open to suggestions and improvements.
+
+
+The rest of this readme is also vibe coded.
+
 
 # Digital Wellbeing App
 

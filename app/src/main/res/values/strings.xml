@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Digital Wellbeing</string>
+    <string name="widget_description">Capybara Sanctuary - Track your screen time with adorable capybaras</string>
+    <string name="accessibility_service_description">Helps maintain digital wellness by gently blocking apps when daily limits are reached. Your capybaras need rest!</string>
 </resources>
